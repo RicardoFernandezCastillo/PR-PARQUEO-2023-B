@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "198230389564",
+    "project_id": "bluh-park",
+    "storage_bucket": "bluh-park.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:198230389564:android:ac9b870d297f11a2536439",
+        "android_client_info": {
+          "package_name": "com.codigocorrecto.bluh_park"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "198230389564-24290hldvfr1nudp51b1cjj0rg0s9dse.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAVJYv2arw46-yEBR_Mk_aSFsUdnO47p0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "198230389564-24290hldvfr1nudp51b1cjj0rg0s9dse.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "198230389564-4h91truusjrkcnbu9u1dijiv0oufnbol.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.bluehpark"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:198230389564:android:77e1cb3032632283536439",
+        "android_client_info": {
+          "package_name": "com.example.bluehpark"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "198230389564-24290hldvfr1nudp51b1cjj0rg0s9dse.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAVJYv2arw46-yEBR_Mk_aSFsUdnO47p0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "198230389564-24290hldvfr1nudp51b1cjj0rg0s9dse.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "198230389564-4h91truusjrkcnbu9u1dijiv0oufnbol.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.bluehpark"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
