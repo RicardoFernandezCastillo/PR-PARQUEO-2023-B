@@ -1,16 +1,16 @@
 import 'package:bluh_park/pages/owner/home_owner_page.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(const Menu());
+void main() => runApp(const MenuOwner());
 
-class Menu extends StatefulWidget {
-  const Menu({super.key});
+class MenuOwner extends StatefulWidget {
+  const MenuOwner({super.key});
 
   @override
-  State<Menu> createState() => _MenuState();
+  State<MenuOwner> createState() => _MenuOwnerState();
 }
 
-class _MenuState extends State<Menu> {
+class _MenuOwnerState extends State<MenuOwner> {
   int selectedIndex = 0;
 
   final List<Widget> pages = <Widget>[
@@ -24,7 +24,7 @@ class _MenuState extends State<Menu> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Material App',
+      title: 'Bluh Park',
       home: Scaffold(
         body: pages[selectedIndex],
         bottomNavigationBar: BottomNavigationBar(

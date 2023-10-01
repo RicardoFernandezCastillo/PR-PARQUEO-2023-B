@@ -1,7 +1,6 @@
-import 'package:bluh_park/pages/navigation_bar.dart';
+import 'package:bluh_park/pages/client/navigation_bar.dart';
+import 'package:bluh_park/pages/owner/navigation_bar.dart';
 import 'package:bluh_park/pages/seccion/seccion_create.dart';
-import 'package:bluh_park/pages/seccion/seccion_edit.dart';
-import 'package:bluh_park/pages/seccion/seccion_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -28,8 +27,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routes: {
-        '/': (context) => const Menu(),
-        '/home': (context) => const Menu(),
+        '/': (context) => const MenuClient(),
+        '/home': (context) => const MenuOwner(),
         '/seccion/create': (context) => const SeccionCreate(),
       },
     );

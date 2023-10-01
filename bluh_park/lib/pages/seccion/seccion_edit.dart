@@ -59,7 +59,7 @@ class _SeccionEditState extends State<SeccionEdit> {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           useMaterial3: true,
         ),
-        title: 'Material App',
+        title: 'Bluh Park',
         home: Scaffold(
           appBar: AppBar(
             leading: IconButton(
@@ -68,7 +68,7 @@ class _SeccionEditState extends State<SeccionEdit> {
                 Navigator.pop(context);
               },
             ),
-            title: const Text('Crear nueva Sección',
+            title: const Text('Editar Sección',
                 style: TextStyle(fontSize: 20, color: Colors.white)),
             backgroundColor: Colors.blue,
           ),
@@ -80,7 +80,7 @@ class _SeccionEditState extends State<SeccionEdit> {
               children: [
                 const SizedBox(height: 10),
                 const Text(
-                  'Nombre de la Sección',
+                  'Sección',
                   style: TextStyle(fontSize: 18, color: Colors.black),
                 ),
                 const SizedBox(height: 10),
@@ -93,7 +93,7 @@ class _SeccionEditState extends State<SeccionEdit> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Descripción de la Sección',
+                  'Detalles',
                   style: TextStyle(fontSize: 18, color: Colors.black),
                 ),
                 const SizedBox(height: 10),
