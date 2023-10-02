@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_create_account/update_parking.dart';
-
+import 'models/user.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -165,7 +164,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                                       setState(() {
                                         selectedGender = value!;
                                       });
-                                    }, 
+                                    },
                                   ),
                                 ),
                               ),
@@ -193,21 +192,20 @@ class RegisterScreenState extends State<RegisterScreen> {
 
                               // Crea una instancia de UserData con los datos
                               UserData userData = UserData(
-                                nombre: nombreController.text,
-                                apellidos: apellidosController.text,
-                                telefono: int.parse(telefonoController.text),
-                                correoElectronico:
-                                correoElectronicoController.text,
-                                contrasena: contrasenaController.text,
-                                genero: 'Masculino'
-                              );
+                                  nombre: nombreController.text,
+                                  apellidos: apellidosController.text,
+                                  telefono: int.parse(telefonoController.text),
+                                  correoElectronico:
+                                      correoElectronicoController.text,
+                                  contrasena: contrasenaController.text,
+                                  genero: 'Masculino');
 
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const UpdateParking()
-                                      // TypeUser(userData: userData),
-                                ),
+                                    builder: (context) => const UpdateParking()
+                                    // TypeUser(userData: userData),
+                                    ),
                               );
                             },
                             style: ElevatedButton.styleFrom(
@@ -255,21 +253,4 @@ class RegisterScreenState extends State<RegisterScreen> {
     );
     return scaffold;
   }
-}
-
-class UserData {
-  final String nombre;
-  final String apellidos;
-  final int telefono;
-  final String correoElectronico;
-  final String contrasena;
-  final String genero;
-  UserData({
-    required this.nombre,
-    required this.apellidos,
-    required this.telefono,
-    required this.correoElectronico,
-    required this.contrasena,
-    required this.genero
-  });
 }

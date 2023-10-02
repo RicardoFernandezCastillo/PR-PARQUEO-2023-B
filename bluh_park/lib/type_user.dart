@@ -1,7 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseFirestore;
+import 'package:firebase_auth/firebase_auth.dart'
+    show FirebaseAuth, UserCredential;
 import 'package:flutter/material.dart';
-import 'package:flutter_create_account/register.dart';
+import 'models/user.dart';
+import 'utilities/progressbar.dart' show ProgressDialog;
+import 'utilities/toast.dart' show Toast;
 
 class TypeUser extends StatelessWidget {
   final UserData userData;
@@ -14,7 +17,6 @@ class TypeUser extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        
         title: const Text(
           'Tipo de Cuenta',
           style: TextStyle(fontSize: 25),
@@ -36,19 +38,20 @@ class TypeUser extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              margin: const EdgeInsets.only(top: 100), // Espacio de 20 puntos en la parte superior
+              margin: const EdgeInsets.only(
+                  top: 100), // Espacio de 20 puntos en la parte superior
               child: Center(
                 child: ElevatedButton(
-                  onPressed: () async{
+                  onPressed: () async {
                     // Acción cuando se presiona el botón
                     try {
-                      ProgressDialog.show(context,
-                          'Registrando usuario...'); // Muestra el diálogo de progreso
-                      await registerUser(userData, 'Dueño');
-                      
+                      ProgressDialog.show(context, 'Registrando usuario...');
+                      userData.typeUser =
+                          'Cliente'; // Muestra el diálogo de progreso
+                      await registerUser(userData, context);
+
                       // ignore: use_build_context_synchronously
-                      ProgressDialog.hide(
-                          context);
+                      ProgressDialog.hide(context);
                     } catch (e) {
                       // ignore: use_build_context_synchronously
                       Toast.show(context, e.toString());
@@ -100,10 +103,11 @@ class TypeUser extends StatelessWidget {
                   onPressed: () async {
                     // Acción cuando se presiona el botón
                     try {
-                      ProgressDialog.show(context,
-                          'Registrando usuario...'); // Muestra el diálogo de progreso
-                      await registerUser(userData, 'Dueño');
-                      
+                      ProgressDialog.show(context, 'Registrando usuario...');
+                      userData.typeUser =
+                          'Dueño'; // Muestra el diálogo de progreso
+                      await registerUser(userData, context);
+
                       // ignore: use_build_context_synchronously
                       ProgressDialog.hide(
                           context); // Oculta el diálogo de progreso después de completar la tarea
@@ -160,8 +164,7 @@ class TypeUser extends StatelessWidget {
   }
 }
 
-
-Future<void> registerUser(UserData userData, String typeUser) async {
+Future<void> registerUser(UserData userData, BuildContext context) async {
   try {
     UserCredential userCredential =
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -182,64 +185,19 @@ Future<void> registerUser(UserData userData, String typeUser) async {
         'telefono': userData.telefono,
         'correoElectronico': userData.correoElectronico,
         'genero': userData.genero,
-        'tipo': typeUser
+        'tipo': userData.typeUser
         // Agrega otros campos de datos aquí
       });
 
       // Registro exitoso, puedes mostrar un mensaje o redirigir al usuario a otra pantalla.
     } else {
       // Handle error: usuario no creado correctamente
-      print('Usuario no creado correctamente');
+      // ignore: use_build_context_synchronously  
+      Toast.show(context,'Usuario no creado correctamente');
     }
   } catch (error) {
     // Handle any registration errors here
-    print('$error');
-  }
-}
-
-class ProgressDialog {
-  static show(BuildContext context, String message) {
-    AlertDialog alert = AlertDialog(
-      content: Row(
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(width: 20),
-          Text(message),
-        ],
-      ),
-    );
-
-    showDialog(
-      context: context,
-      barrierDismissible:
-          false, // Evita que el usuario cierre el diálogo tocando fuera de él
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-  static hide(BuildContext context) {
-    Navigator.of(context).pop(); // Cierra el diálogo de progreso
-  }
-}
-
-class Toast {
-  static void show(BuildContext context, String message) {
-    final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.blue,
-        content: Text(
-          message,
-          style: const TextStyle(fontSize: 18),
-        ),
-        action: SnackBarAction(
-          label: 'Cerrar',
-          onPressed: scaffold.hideCurrentSnackBar,
-          textColor: Colors.white,
-        ),
-      ),
-    );
+    // ignore: use_build_context_synchronously
+    Toast.show(context,'$error'.toString());
   }
 }

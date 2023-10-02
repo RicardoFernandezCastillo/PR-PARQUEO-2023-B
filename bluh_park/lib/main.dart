@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_create_account/user_section/details_reserve.dart';
+import 'package:flutter_create_account/user_section/search_parking_spaces.dart';
 import 'firebase_options.dart';
-import 'register.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/register', // Ruta inicial a 'register.dart'
       routes: {
-        '/register': (context) => const RegisterScreen(), // Define la ruta '/register'
+        '/register': (context) => const ReservationDetails(), // Define la ruta '/register'
       },
     );
   }

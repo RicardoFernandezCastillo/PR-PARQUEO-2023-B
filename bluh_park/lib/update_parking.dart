@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_create_account/type_user.dart';
+import 'utilities/toast.dart';
+import 'utilities/progressbar.dart';
 
 class UpdateParking extends StatefulWidget {
   // ignore: use_key_in_widget_constructors
@@ -24,7 +25,7 @@ class _UpdateParkingState extends State<UpdateParking> {
   TextEditingController coberturaController = TextEditingController();
   TextEditingController horaEntradaController = TextEditingController();
   TextEditingController horaSalidaController = TextEditingController();
-  bool isLoading = true;
+
 
   @override
   void initState() {
