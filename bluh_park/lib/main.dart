@@ -7,6 +7,8 @@ import 'package:test_project/firebase_options.dart';
 import 'agregarPiso.dart'; 
 import 'registroParqueo.dart';
 import 'vistaParqueo.dart';// Importa la segunda pantalla
+import 'registroReserva.dart';
+import 'vistaParqueoDisponible.dart';
 
 // void main() {
 //   runApp(MyApp());
@@ -44,6 +46,82 @@ void main() async {
 
  
 
+// class MyApp extends StatelessWidget {
+
+//   const MyApp({super.key});
+
+//   @override
+
+//   Widget build(BuildContext context) {
+
+//     return ChangeNotifierProvider(
+
+//       create: (ctx) => Auth(),
+
+//       child: MaterialApp(
+
+//         debugShowCheckedModeBanner: false,
+
+//         theme: ThemeData(
+
+//           primarySwatch: Colors.blue,
+
+//         ),
+
+//         home: CreateParqueoScreen(),
+
+//         routes: {
+
+//           CreateParqueoScreen.routeName: (context) => CreateParqueoScreen(),
+//         },
+
+//       ),
+
+//     );
+
+//   }
+
+// }
+
+
+// class MyApp extends StatelessWidget {
+
+//   const MyApp({super.key});
+
+//   @override
+
+//   Widget build(BuildContext context) {
+
+//     return ChangeNotifierProvider(
+
+//       create: (ctx) => Auth(),
+
+//       child: MaterialApp(
+
+//         debugShowCheckedModeBanner: false,
+
+//         theme: ThemeData(
+
+//           primarySwatch: Colors.blue,
+
+//         ),
+
+//         home: CreateReservaScreen(),
+
+//         routes: {
+
+//           CreateReservaScreen.routeName: (context) => CreateReservaScreen(),
+//         },
+
+//       ),
+
+//     );
+
+//   }
+
+// }
+
+
 class MyApp extends StatelessWidget {
 
   const MyApp({super.key});
@@ -66,11 +144,11 @@ class MyApp extends StatelessWidget {
 
         ),
 
-        home: CreateParqueoScreen(),
+        home: ParqueoDisponibleListScreen(),
 
         routes: {
 
-          CreateParqueoScreen.routeName: (context) => CreateParqueoScreen(),
+          ParqueoDisponibleListScreen.routeName: (context) => ParqueoDisponibleListScreen(),
         },
 
       ),

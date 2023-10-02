@@ -2,6 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
 
+import 'vistaPiso.dart';
+
+import 'models/Parqueo.dart';
+
  
 
 class Plaza {
@@ -15,48 +19,14 @@ class Plaza {
   Plaza(this.nombre, this.tieneCobertura,this.idPlaza);
 
 }
-class Parqueo {
 
-  final String idParqueo;
-
-  final String nombre;
-
-  final String direccion;
-
-  final GeoPoint ubicacion;
-
-  final bool tieneCobertura;
-
-  final String descripcion;
-
-  final Map<String, dynamic> vehiculosPermitidos; //BOOL
-
-  final String nit;
-
-  final Map<String, dynamic> tarifaMoto; //DOUBLE
-
-  final Map<String, dynamic> tarifaAutomovil; //DOUBLE
-
-  final Map<String, dynamic> tarifaOtro; //DOUBLE
-
-  final String horaApertura;
-
-  final String horaCierre;
-
-  final String idDuenio;
-
-  Parqueo(this.idParqueo, this.nombre, this.direccion, this.ubicacion, 
-          this.tieneCobertura, this.descripcion, this.vehiculosPermitidos, this.nit, 
-          this.tarifaAutomovil, this.tarifaMoto, this.tarifaOtro, this.horaApertura, this.horaCierre, this.idDuenio);
-
-}
  
 
 class CreateParqueoScreen extends StatelessWidget {
 
   static const routeName = '/vista-parqueo';
 
- 
+
 
   const CreateParqueoScreen({super.key});
 
@@ -119,7 +89,7 @@ class _ParqueoListScreenState extends State<ParqueoListScreen> {
       ),
 
       body: StreamBuilder(
-
+        
         stream: obtenerParqueosStream(),
 
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -140,7 +110,7 @@ class _ParqueoListScreenState extends State<ParqueoListScreen> {
 
  
 
-          // Obtén la lista de plazas
+          // Obtén la lista de Parqueos
 
             List<Parqueo> parqueos =
 
@@ -178,8 +148,21 @@ class _ParqueoListScreenState extends State<ParqueoListScreen> {
                   // Por ejemplo, puedes abrir una pantalla de detalles de la plaza.
 
                   //abrirDetallesPlaza(plaza);
+                  Navigator.push(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                    builder: (context) => CreatePisoScreen(idParqueo:parqueo.idParqueo),
+
+                    ),
+
+                  );
 
                 },
+                
+                
 
                 child: ListTile(
 
@@ -340,7 +323,7 @@ class _AgregarParqueoScreen extends State<AgregarParqueoScreen> {
 
       appBar: AppBar(
 
-        title: const Text('Agregar Nueva Plaza'),
+        title: const Text('Agregar Nuevo Parqueo'),
 
         backgroundColor: Colors.blue,
 
@@ -1006,6 +989,7 @@ Future<void> agregarParqueo(Map<String, dynamic> datos) async {
       FirebaseFirestore.instance.collection('parqueo');
 
   // Obtén una referencia al documento del parqueo
+  
 
   
   await parqueos.doc().set(datos);
@@ -1044,9 +1028,7 @@ Future<void> editarPlaza(String idParqueo, String idPiso, String idFila,
 
     // Utiliza update para modificar campos existentes o set con merge: true para combinar datos nuevos con los existentes
 
-    await plazaDocRef.update(
-
-        datos); // Utiliza update para modificar campos existentes o set con merge: true
+    await plazaDocRef.update(datos); // Utiliza update para modificar campos existentes o set con merge: true
 
   } catch (e) {
 
