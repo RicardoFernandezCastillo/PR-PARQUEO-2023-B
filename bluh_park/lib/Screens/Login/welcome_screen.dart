@@ -88,7 +88,7 @@ class WelcomeScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: Colors.black45,
                           ),
                         ),
                       ),
@@ -112,7 +112,7 @@ class WelcomeScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: Colors.black45,
                           ),
                         ),
                       ),

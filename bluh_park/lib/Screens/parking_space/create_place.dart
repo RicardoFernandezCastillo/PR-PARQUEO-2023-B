@@ -1,12 +1,7 @@
+import 'package:bluehpark/Models/parking.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class Plaza {
-  final String nombre;
-  final bool tieneCobertura;
-  final String idPlaza;
-  Plaza(this.nombre, this.tieneCobertura,this.idPlaza);
-}
 
 class CreatePlaceScreen extends StatelessWidget {
   static const routeName = '/create-place-srceen';
@@ -17,10 +12,9 @@ class CreatePlaceScreen extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Formulario de Plaza'),
-          backgroundColor: const Color.fromARGB(255, 5, 126, 225),
-        ),
-        body: PlazaListScreen(),
+            title: const Text('Lista de Plazas'),
+            backgroundColor: const Color.fromARGB(255, 5, 126, 225)),
+        body: const PlazaListScreen(),
       ),
     );
   }
@@ -37,15 +31,13 @@ class _PlazaListScreenState extends State<PlazaListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lista de Plazas'),
-        backgroundColor: Colors.blue,
-      ),
       body: StreamBuilder(
         stream: obtenerPlazasStream('ID-PARQUEO-3', 'ID-PISO-1', 'ID-FILA-1'),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
 
           if (snapshot.hasError) {
@@ -53,12 +45,17 @@ class _PlazaListScreenState extends State<PlazaListScreen> {
           }
 
           // Obtén la lista de plazas
-            List<Plaza> plazas =
-                snapshot.data!.docs.map((DocumentSnapshot document) {
-              Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-              String idDocumento = document.id; // Obtener el ID del documento
-              return Plaza(data['nombre'], data['tieneCobertura'], idDocumento);
-            }).toList();
+          List<Plaza> plazas =
+              snapshot.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+            DocumentReference idDocumento = document.reference; // Obtener
+            return Plaza(
+              idPlaza: idDocumento,
+              nombre: data['nombre'],
+              tieneCobertura: data['tieneCobertura'],
+              estado: data['estado'],
+            );
+          }).toList();
 
           return ListView.builder(
             itemCount: plazas.length,
@@ -66,30 +63,38 @@ class _PlazaListScreenState extends State<PlazaListScreen> {
               final plaza = plazas[index];
               return InkWell(
                 onTap: () {
-                  // Aquí puedes definir la acción que se realizará al hacer clic en el elemento.
+                  // Implementa aquí la lógica que se realizará al hacer clic en el elemento.
                   // Por ejemplo, puedes abrir una pantalla de detalles de la plaza.
-                  //abrirDetallesPlaza(plaza);
                 },
-                child: ListTile(
-                  title: Text(plaza.nombre),
-                  subtitle: Text(
-                      plaza.tieneCobertura ? 'Con Cobertura' : 'Sin Cobertura'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          // Implementa aquí la lógica para abrir la pantalla de edición.
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditarPlazaScreen(idPlaza:plaza.idPlaza),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                child: Card(
+                  elevation: 3.0,
+                  margin: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                  child: ListTile(
+                    title: Text(
+                      plaza.nombre,
+                      style: const TextStyle(
+                          fontSize: 18.0, fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      plaza.estado == 'disponible'
+                          ? 'Disponible'
+                          : 'No disponible',
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      onPressed: () {
+                        // Implementa aquí la lógica para abrir la pantalla de edición.
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                EditarPlazaScreen(idPlaza: plaza.idPlaza),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               );
@@ -124,6 +129,8 @@ class _PlazaListScreenState extends State<PlazaListScreen> {
 }
 
 class AgregarPlazaScreen extends StatefulWidget {
+  const AgregarPlazaScreen({super.key});
+
   @override
   _AgregarPlazaScreen createState() => _AgregarPlazaScreen();
 }
@@ -132,7 +139,8 @@ class _AgregarPlazaScreen extends State<AgregarPlazaScreen> {
   String nombre = '';
   String tipoVehiculo = '';
   bool tieneCobertura = false;
-  String pisoYFila = '';
+  String descripcion = '';
+  String estado = 'disponible';
 
   @override
   Widget build(BuildContext context) {
@@ -144,12 +152,12 @@ class _AgregarPlazaScreen extends State<AgregarPlazaScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment
+              .stretch, // Alinear los elementos al ancho completo
           children: <Widget>[
             TextFormField(
               decoration: const InputDecoration(
                 labelText: 'Nombre',
-                fillColor: Colors.blue,
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue, width: 2.0),
                 ),
@@ -161,12 +169,9 @@ class _AgregarPlazaScreen extends State<AgregarPlazaScreen> {
               },
             ),
             const SizedBox(height: 20.0),
-            Container(
-              alignment: Alignment.topLeft,
-              child: const Text(
-                'Tipo de Vehículo',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
+            const Text(
+              'Tipo de Vehículo',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
             ),
             Row(
               children: <Widget>[
@@ -203,11 +208,10 @@ class _AgregarPlazaScreen extends State<AgregarPlazaScreen> {
               ],
             ),
             const SizedBox(height: 20.0),
-            Container(
-                alignment: Alignment.topLeft,
-                child: const Text('¿Tiene Cobertura?',
-                    style: TextStyle(
-                        fontSize: 16.0, fontWeight: FontWeight.bold))),
+            const Text(
+              '¿Tiene Cobertura?',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            ),
             Row(
               children: <Widget>[
                 Radio(
@@ -233,17 +237,45 @@ class _AgregarPlazaScreen extends State<AgregarPlazaScreen> {
               ],
             ),
             const SizedBox(height: 20.0),
+            const Text(
+              'Estado de la plaza',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            ),
+            Row(
+              children: <Widget>[
+                Radio(
+                  value: 'disponible',
+                  groupValue: estado,
+                  onChanged: (val) {
+                    setState(() {
+                      estado = val!;
+                    });
+                  },
+                ),
+                const Text('Disponible'),
+                Radio(
+                  value: 'noDisponible',
+                  groupValue: estado,
+                  onChanged: (val) {
+                    setState(() {
+                      estado = val!;
+                    });
+                  },
+                ),
+                const Text('No Disponible'),
+              ],
+            ),
+            const SizedBox(height: 20.0),
             TextFormField(
               decoration: const InputDecoration(
-                labelText: 'Piso y Fila',
-                fillColor: Colors.blue,
+                labelText: 'Descripcion',
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue, width: 2.0),
                 ),
               ),
               onChanged: (val) {
                 setState(() {
-                  pisoYFila = val;
+                  descripcion = val;
                 });
               },
             ),
@@ -255,19 +287,24 @@ class _AgregarPlazaScreen extends State<AgregarPlazaScreen> {
                   'tipoVehiculo': tipoVehiculo, // Tipo de vehículo permitido
                   'tieneCobertura':
                       tieneCobertura, // Indica si tiene cobertura o no
-                  'piso_fila': pisoYFila, // Piso y Fila
-                  // Puedes agregar otros campos según tus necesidades
+                  'descripcion': descripcion, // Piso y Fila
+                  'estado': estado, // Estado
                 };
                 // Llama a la función para agregar el documento a la subcolección
                 await agregarDocumentoASubcoleccion(
                     'IDParqueo', 'IDPiso', 'IDFila', datos);
                 // Crea una nueva Plaza y devuelve los datos a la pantalla anterior.
-                Navigator.pop(
-                  context
-                );
+                Navigator.pop(context);
               },
-              style: ElevatedButton.styleFrom(primary: Colors.blue),
-              child: const Text('Agregar Plaza'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16.0), // Espaciado vertical para el botón
+              ),
+              child: const Text(
+                'Agregar Plaza',
+                style: TextStyle(fontSize: 18.0), // Tamaño de fuente del botón
+              ),
             ),
           ],
         ),
@@ -277,9 +314,9 @@ class _AgregarPlazaScreen extends State<AgregarPlazaScreen> {
 }
 
 class EditarPlazaScreen extends StatefulWidget {
-  final String idPlaza; // Recibe el ID de la plaza
+  final DocumentReference idPlaza; // Recibe el ID de la plaza
 
-  EditarPlazaScreen({required this.idPlaza});
+  const EditarPlazaScreen({super.key, required this.idPlaza});
 
   @override
   _EditarPlazaScreenState createState() => _EditarPlazaScreenState();
@@ -287,10 +324,12 @@ class EditarPlazaScreen extends StatefulWidget {
 
 class _EditarPlazaScreenState extends State<EditarPlazaScreen> {
   TextEditingController nombreController = TextEditingController();
-  TextEditingController pisoYFilaController = TextEditingController();
+  TextEditingController descripcionController = TextEditingController();
 
   String tipoVehiculo = '';
   bool tieneCobertura = false;
+  String estado = 'noDisponible';
+  String descripcion = '';
 
   @override
   void initState() {
@@ -300,18 +339,20 @@ class _EditarPlazaScreenState extends State<EditarPlazaScreen> {
 
   Future<void> cargarDatosPlaza() async {
     try {
-      // Usa el ID de la plaza para obtener los datos desde Firestore
-      DocumentSnapshot<Map<String, dynamic>> plazaDoc = await FirebaseFirestore
-          .instance
-          .collection('parqueo')
-          .doc('ID-PARQUEO-3')
-          .collection('pisos')
-          .doc('ID-PISO-1')
-          .collection('filas')
-          .doc('ID-FILA-1')
-          .collection('plazas')
-          .doc(widget.idPlaza) // Usa el ID de la plaza pasado como argumento
-          .get();
+      // DocumentSnapshot<Map<String, dynamic>> plazaDoc = await FirebaseFirestore
+      //     .instance
+      //     .collection('parqueo')
+      //     .doc('ID-PARQUEO-3')
+      //     .collection('pisos')
+      //     .doc('ID-PISO-1')
+      //     .collection('filas')
+      //     .doc('ID-FILA-1')
+      //     .collection('plazas')
+      //     .doc(widget.idPlaza) // Usa el ID de la plaza pasado como argumento
+      //     .get();
+      DocumentReference plazaRef = widget.idPlaza;
+      DocumentSnapshot<Map<String, dynamic>> plazaDoc =
+          await plazaRef.get() as DocumentSnapshot<Map<String, dynamic>>;
 
       if (plazaDoc.exists) {
         Map<String, dynamic> data = plazaDoc.data() as Map<String, dynamic>;
@@ -319,7 +360,8 @@ class _EditarPlazaScreenState extends State<EditarPlazaScreen> {
           nombreController.text = data['nombre'];
           tipoVehiculo = data['tipoVehiculo'];
           tieneCobertura = data['tieneCobertura'];
-          pisoYFilaController.text = data['piso_fila'];
+          descripcionController.text = data['descripcion'];
+          estado = data['estado'];
         });
       }
     } catch (e) {
@@ -337,25 +379,21 @@ class _EditarPlazaScreenState extends State<EditarPlazaScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             TextFormField(
               controller: nombreController,
               decoration: const InputDecoration(
                 labelText: 'Nombre',
-                fillColor: Colors.blue,
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue, width: 2.0),
                 ),
-              ),// Establece el valor inicial desde Firestore
+              ),
             ),
             const SizedBox(height: 20.0),
-            Container(
-              alignment: Alignment.topLeft,
-              child: const Text(
-                'Tipo de Vehículo',
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
+            const Text(
+              'Tipo de Vehículo',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
             ),
             Row(
               children: <Widget>[
@@ -392,11 +430,39 @@ class _EditarPlazaScreenState extends State<EditarPlazaScreen> {
               ],
             ),
             const SizedBox(height: 20.0),
-            Container(
-                alignment: Alignment.topLeft,
-                child: const Text('¿Tiene Cobertura?',
-                    style: TextStyle(
-                        fontSize: 16.0, fontWeight: FontWeight.bold))),
+            const Text(
+              'Estado de la plaza',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            ),
+            Row(
+              children: <Widget>[
+                Radio(
+                  value: 'disponible',
+                  groupValue: estado,
+                  onChanged: (val) {
+                    setState(() {
+                      estado = val!;
+                    });
+                  },
+                ),
+                const Text('Disponible'),
+                Radio(
+                  value: 'noDisponible',
+                  groupValue: estado,
+                  onChanged: (val) {
+                    setState(() {
+                      estado = val!;
+                    });
+                  },
+                ),
+                const Text('No Disponible'),
+              ],
+            ),
+            const SizedBox(height: 20.0),
+            const Text(
+              '¿Tiene Cobertura?',
+              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+            ),
             Row(
               children: <Widget>[
                 Radio(
@@ -423,40 +489,41 @@ class _EditarPlazaScreenState extends State<EditarPlazaScreen> {
             ),
             const SizedBox(height: 20.0),
             TextFormField(
-              controller: pisoYFilaController,
+              controller: descripcionController,
               decoration: const InputDecoration(
-                labelText: 'Piso y Fila',
-                fillColor: Colors.blue,
+                labelText: 'Descripción',
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue, width: 2.0),
                 ),
-              ) // Establece el valor inicial desde Firestore
+              ),
             ),
             const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () async {
                 Map<String, dynamic> datos = {
-                  'nombre': nombreController.text, // Nombre de la plaza
-                  'tipoVehiculo': tipoVehiculo, // Tipo de vehículo permitido
-                  'tieneCobertura':
-                      tieneCobertura, // Indica si tiene cobertura o no
-                  'piso_Fila': pisoYFilaController.text, // Piso y Fila
-                  // Puedes agregar otros campos según tus necesidades
+                  'nombre': nombreController.text,
+                  'tipoVehiculo': tipoVehiculo,
+                  'tieneCobertura': tieneCobertura,
+                  'descripcion': descripcionController.text,
+                  'estado': estado,
                 };
-                // Llama a la función para actualizar el documento en Firestore
                 await editarPlaza(
-                    'ID-PARQUEO-3',
-                    'ID-PISO-1',
-                    'ID-FILA-1',
-                    widget.idPlaza,
-                    datos); // Usa el ID de la plaza pasado como argumento
-                // Regresa a la pantalla anterior con los datos actualizados
-                Navigator.pop(
-                  context //Se puede enviar Un objeto plaza
+                  'ID-PARQUEO-3',
+                  'ID-PISO-1',
+                  'ID-FILA-1',
+                  widget.idPlaza,
+                  datos,
                 );
+                Navigator.pop(context);
               },
-              style: ElevatedButton.styleFrom(primary: Colors.blue),
-              child: const Text('Guardar Cambios'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+              ),
+              child: const Text(
+                'Guardar Cambios',
+                style: TextStyle(fontSize: 18.0),
+              ),
             ),
           ],
         ),
@@ -465,143 +532,6 @@ class _EditarPlazaScreenState extends State<EditarPlazaScreen> {
   }
 }
 
-/*
-class ParqueoForm extends StatefulWidget {
-  const ParqueoForm({super.key});
-
-  @override
-  _ParqueoFormState createState() => _ParqueoFormState();
-}
-
-class _ParqueoFormState extends State<ParqueoForm> {
-  String nombre = '';
-  String tipoVehiculo = '';
-  bool tieneCobertura = false;
-  String pisoYFila = '';
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Nombre',
-              fillColor: Colors.blue,
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue, width: 2.0),
-              ),
-            ),
-            onChanged: (val) {
-              setState(() {
-                nombre = val;
-              });
-            },
-          ),
-          const SizedBox(height: 20.0),
-          Container(alignment: Alignment.topLeft,child: const Text('Tipo de Vehículo', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),),),
-          Row(
-            children: <Widget>[
-              Radio(
-                value: 'Moto',
-                groupValue: tipoVehiculo,
-                onChanged: (val) {
-                  setState(() {
-                    tipoVehiculo = val!;
-                  });
-                },
-              ),
-              const Text('Moto'),
-              Radio(
-                value: 'Automóvil',
-                groupValue: tipoVehiculo,
-                onChanged: (val) {
-                  setState(() {
-                    tipoVehiculo = val!;
-                  });
-                },
-              ),
-              const Text('Automóvil'),
-              Radio(
-                value: 'Otro',
-                groupValue: tipoVehiculo,
-                onChanged: (val) {
-                  setState(() {
-                    tipoVehiculo = val!;
-                  });
-                },
-              ),
-              const Text('Otro'),
-            ],
-          ),
-          const SizedBox(height: 20.0),
-          Container(alignment: Alignment.topLeft,child: const Text('¿Tiene Cobertura?', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold))),
-          Row(
-            children: <Widget>[
-              Radio(
-                value: true,
-                groupValue: tieneCobertura,
-                onChanged: (val) {
-                  setState(() {
-                    tieneCobertura = val!;
-                  });
-                },
-              ),
-              const Text('Sí'),
-              Radio(
-                value: false,
-                groupValue: tieneCobertura,
-                onChanged: (val) {
-                  setState(() {
-                    tieneCobertura = val!;
-                  });
-                },
-              ),
-              const Text('No'),
-            ],
-          ),
-          const SizedBox(height: 20.0),
-          TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Piso y Fila',
-              fillColor: Colors.blue,
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue, width: 2.0),
-              ),
-            ),
-            onChanged: (val) {
-              setState(() {
-                pisoYFila = val;
-              });
-            },
-            
-          ),
-          const SizedBox(height: 20.0),
-          ElevatedButton(
-            onPressed: () async{
-              // Aquí puedes manejar la lógica para enviar el formulario o guardar los datos.
-                Map<String, dynamic> datos = {
-                  'nombre': nombre, // Nombre de la plaza
-                  'tipoVehiculo': tipoVehiculo, // Tipo de vehículo permitido
-                  'tieneCobertura': tieneCobertura, // Indica si tiene cobertura o no
-                  'Piso y Fila': pisoYFila, // Piso y Fila
-                  // Puedes agregar otros campos según tus necesidades
-                };
-                // Llama a la función para agregar el documento a la subcolección
-                await agregarDocumentoASubcoleccion('IDParqueo', 'IDPiso', 'IDFila', datos);
-            },
-            style: ElevatedButton.styleFrom(primary: Colors.blue),
-            child: const Text('Enviar'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-*/
 Future<void> agregarDocumentoASubcoleccion(String idParqueo, String idPiso,
     String idFila, Map<String, dynamic> datos) async {
   // Obtén una referencia a la colección principal, en este caso, 'parqueos'
@@ -619,26 +549,19 @@ Future<void> agregarDocumentoASubcoleccion(String idParqueo, String idPiso,
   DocumentReference filaDocRef = filas.doc('ID-FILA-1');
   // Obtén una referencia a la subcolección 'plazas' dentro del documento de la fila
   CollectionReference plazasCollection = filaDocRef.collection('plazas');
+  //datos.addAll({'idParqueo': parqueoDocRef,'idPiso': pisoDocRef,'idFila': filaDocRef});
   // Usa set para agregar el documento con los datos proporcionados
   await plazasCollection.doc().set(datos);
 }
 
 Future<void> editarPlaza(String idParqueo, String idPiso, String idFila,
-    String idPlaza, Map<String, dynamic> datos) async {
+    DocumentReference idPlaza, Map<String, dynamic> datos) async {
   try {
     // Obtén una referencia al documento de la plaza que deseas editar
-    DocumentReference plazaDocRef = FirebaseFirestore.instance
-        .collection('parqueo')
-        .doc(idParqueo)
-        .collection('pisos')
-        .doc(idPiso)
-        .collection('filas')
-        .doc(idFila)
-        .collection('plazas')
-        .doc(idPlaza);
 
+    DocumentReference plazaRef = idPlaza;
     // Utiliza update para modificar campos existentes o set con merge: true para combinar datos nuevos con los existentes
-    await plazaDocRef.update(
+    await plazaRef.update(
         datos); // Utiliza update para modificar campos existentes o set con merge: true
   } catch (e) {
     print('Error al editar la plaza: $e');
@@ -662,7 +585,12 @@ Future<List<Plaza>> getPlaces(
     // Mapea los documentos en objetos de la clase Plaza
     List<Plaza> plazas = querySnapshot.docs.map((DocumentSnapshot document) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-      return Plaza(data['nombre'], data['tieneCobertura'],document.id);
+      return Plaza(
+        idPlaza: document.reference,
+        nombre: data['nombre'],
+        tieneCobertura: data['tieneCobertura'],
+        estado: data['estado'],
+      );
     }).toList();
 
     return plazas;
@@ -675,6 +603,14 @@ Future<List<Plaza>> getPlaces(
 Stream<QuerySnapshot> obtenerPlazasStream(
     String idParqueo, String idPiso, String idFila) {
   try {
+    DocumentSnapshot<Map<String, dynamic>> plazaDoc = FirebaseFirestore.instance
+        .collection('parqueo')
+        .doc('ID-PARQUEO-3') as DocumentSnapshot<Map<String, dynamic>>;
+    if (plazaDoc.exists) {
+      Map<String, dynamic> data = plazaDoc.data() as Map<String, dynamic>;
+      String nombre = data['nombre'];
+    }
+
     CollectionReference plazasCollection = FirebaseFirestore.instance
         .collection('parqueo')
         .doc(idParqueo)

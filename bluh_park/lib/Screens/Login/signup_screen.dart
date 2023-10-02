@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'successful_screen.dart';
@@ -166,20 +168,20 @@ class SignupScreen extends StatelessWidget {
                     ),
                     const Divider(thickness: 0, color: Colors.white),
                     /*
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    //Text('Don\'t have an account yet ? ', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),),
-                    TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                  ),
-                  ],
-                ),
-                  */
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          //Text('Don\'t have an account yet ? ', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),),
+                          TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            'Sign Up',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                          ),
+                        ),
+                        ],
+                      ),
+                    */
                   ],
                 ),
               ),
@@ -198,9 +200,9 @@ Future<UserCredential?> auntenticator(var user, var password) async {
     return credential;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
-      print('No user found for that email.');
+      log('No user found for that email.');
     } else if (e.code == 'wrong-password') {
-      print('Wrong password provided for that user.');
+      log('Wrong password provided for that user.');
     }
     return null; // Devuelve null en caso de error.
   }

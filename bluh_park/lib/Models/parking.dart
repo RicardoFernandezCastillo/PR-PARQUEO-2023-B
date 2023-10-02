@@ -1,27 +1,95 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-Future<void> agregarDocumentoASubcoleccion(String idParqueo, String idPiso, String idFila, Map<String, dynamic> datos) async {
-  // Obtén una referencia a la colección principal, en este caso, 'parqueos'
-  CollectionReference parqueos = FirebaseFirestore.instance.collection('parqueos');
 
-  // Obtén una referencia al documento del parqueo
-  DocumentReference parqueoDocRef = parqueos.doc(idParqueo);
 
-  // Obtén una referencia a la subcolección 'pisos' dentro del documento del parqueo
-  CollectionReference pisos = parqueoDocRef.collection('pisos');
-
-  // Obtén una referencia al documento del piso
-  DocumentReference pisoDocRef = pisos.doc(idPiso);
-
-  // Obtén una referencia a la subcolección 'filas' dentro del documento del piso
-  CollectionReference filas = pisoDocRef.collection('filas');
-
-  // Obtén una referencia al documento de la fila
-  DocumentReference filaDocRef = filas.doc(idFila);
-
-  // Agrega el documento con los datos proporcionados a la subcolección 'plazas' dentro del documento de la fila
-  await filaDocRef.collection('plazas').add(datos);
+class Plaza {
+  final DocumentReference idPlaza;
+  String nombre;
+  bool tieneCobertura;
+  String estado;
+  Plaza(
+      {required this.idPlaza,
+      required this.nombre,
+      required this.tieneCobertura,
+      required this.estado,});
 }
+
+class Piso {
+  final DocumentReference idPiso;
+  final String nombre;
+  final String descripcion;
+  List<Fila> filas;
+  Piso({
+    required this.idPiso,
+    required this.descripcion,
+    required this.nombre,
+    List<Fila>? filas, // Usamos List<Fila>? para permitir un valor nulo
+  }) : filas =
+            filas ?? []; // Si filas es nulo, inicializamos con una lista vacía
+}
+
+class Fila {
+  final DocumentReference idFila;
+  final String nombre;
+  final String descripcion;
+
+  List<Plaza> plazas;
+  Fila(
+      {required this.nombre,
+      required this.descripcion,
+      required this.idFila,
+      List<Plaza>? plazas})
+      : plazas = plazas ?? [];
+}
+
+class Parqueo {
+  final DocumentReference idParqueo;
+  String nombre;
+  String direccion;
+  final GeoPoint ubicacion;
+  bool tieneCobertura;
+  String descripcion;
+  final Map<String, dynamic> vehiculosPermitidos; // BOOL
+  final String nit;
+  Map<String, dynamic> tarifaMoto; // DOUBLE
+  Map<String, dynamic> tarifaAutomovil; // DOUBLE
+  Map<String, dynamic> tarifaOtro; // DOUBLE
+  Timestamp horaApertura;
+  Timestamp horaCierre;
+  final String idDuenio;
+  List<Piso> pisos;
+
+  Parqueo({
+    required this.idParqueo,
+    required this.nombre,
+    required this.direccion,
+    required this.ubicacion,
+    required this.tieneCobertura,
+    required this.descripcion,
+    required this.vehiculosPermitidos,
+    required this.nit,
+    required this.tarifaAutomovil,
+    required this.tarifaMoto,
+    required this.tarifaOtro,
+    required this.horaApertura,
+    required this.horaCierre,
+    required this.idDuenio,
+    List<Piso>? pisos, // Parámetro con nombre para filas, opcional
+  }) : pisos = pisos ??
+            <Piso>[]; // Inicializa con una lista vacía si no se proporciona
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Future<Parqueo> obtenerParqueoDesdeFirestore(String idParqueo) async {
 //   DocumentSnapshot parqueoDocument =
