@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_create_account/utilities/toast.dart';
+
 import 'package:intl/intl.dart';
 
 class ReservationDetails extends StatefulWidget {
@@ -258,7 +258,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                       const SizedBox(height: 20),
                       Container(
                         alignment: Alignment.centerLeft,
-                        padding: const EdgeInsets.all(5),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           color: const Color.fromARGB(220, 217, 217, 217),
@@ -550,7 +550,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                                           8), // Espacio entre el ícono y el texto
                                   Text(
                                     reservationDateIn != null
-                                        ? DateFormat('dd/MM/yyyy HH:mm')
+                                        ? DateFormat('dd/MM/yyyy HH:mm: a')
                                             .format(reservationDateIn!)
                                         : 'Selecciona Fecha y Hora',
                                   ),
@@ -585,7 +585,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                                           8), // Espacio entre el ícono y el texto
                                   Text(
                                     reservationDateOut != null
-                                        ? DateFormat('dd/MM/yyyy HH:mm')
+                                        ? DateFormat('dd/MM/yyyy HH:mm a')
                                             .format(reservationDateOut!)
                                         : 'Selecciona Fecha y Hora',
                                   ),

@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +26,6 @@ class _UpdateParkingState extends State<UpdateParking> {
   TextEditingController coberturaController = TextEditingController();
   TextEditingController horaEntradaController = TextEditingController();
   TextEditingController horaSalidaController = TextEditingController();
-
 
   @override
   void initState() {
@@ -61,7 +61,8 @@ class _UpdateParkingState extends State<UpdateParking> {
 
         motosHoraController.text = data['tarifa_moto']['hora'].toString();
         motosDiasController.text = data['tarifa_moto']['dia'].toString();
-        autosHoraController.text =data['tarifa_automoviles']['hora'].toString();
+        autosHoraController.text =
+            data['tarifa_automoviles']['hora'].toString();
         autosDiasController.text = data['tarifa_automoviles']['dia'].toString();
         otrosHoraController.text = data['tarifa_otros']['hora'].toString();
         otrosDiasController.text = data['tarifa_otros']['dia'].toString();
@@ -79,7 +80,9 @@ class _UpdateParkingState extends State<UpdateParking> {
   Future<void> actualizarDocumento() async {
     try {
       // Obtén la referencia al documento que deseas actualizar
-      DocumentReference reference = FirebaseFirestore.instance .collection('parqueo').doc('LX4qJk0irt98bWgXLOuW');
+      DocumentReference reference = FirebaseFirestore.instance
+          .collection('parqueo')
+          .doc('LX4qJk0irt98bWgXLOuW');
 
       Map<String, bool> vehiculosPermitidos = <String, bool>{
         'Motos': checkboxValues[0],
@@ -219,8 +222,10 @@ class _UpdateParkingState extends State<UpdateParking> {
                           children: [
                             const Padding(
                               padding: EdgeInsets.only(left: 16.0, top: 10),
-                              child: Text('Vehiculos Disponibles',
-                                  style: TextStyle(fontSize: 20)),
+                              child: Text(
+                                'Vehiculos Disponibles',
+                                style: TextStyle(fontSize: 20),
+                              ),
                             ),
                             const SizedBox(height: 10),
                             Row(
@@ -272,8 +277,10 @@ class _UpdateParkingState extends State<UpdateParking> {
                           children: [
                             const Padding(
                               padding: EdgeInsets.only(left: 16.0, top: 10),
-                              child:
-                                  Text('Motos', style: TextStyle(fontSize: 20)),
+                              child: Text('Motos',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                  )),
                             ),
                             const SizedBox(height: 10),
                             Row(
@@ -286,8 +293,10 @@ class _UpdateParkingState extends State<UpdateParking> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Tarifa Horas:',
-                                            style: TextStyle(fontSize: 16)),
+                                        const Text(
+                                          'Tarifa Horas:',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                         const SizedBox(height: 5),
                                         Row(
                                           children: [
@@ -332,8 +341,10 @@ class _UpdateParkingState extends State<UpdateParking> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Tarifa Dias:',
-                                            style: TextStyle(fontSize: 16)),
+                                        const Text(
+                                          'Tarifa Dias:',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                         const SizedBox(height: 5),
                                         Row(
                                           children: [
@@ -390,8 +401,10 @@ class _UpdateParkingState extends State<UpdateParking> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Tarifa Horas:',
-                                            style: TextStyle(fontSize: 16)),
+                                        const Text(
+                                          'Tarifa Horas:',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                         const SizedBox(height: 5),
                                         Row(
                                           children: [
@@ -436,8 +449,10 @@ class _UpdateParkingState extends State<UpdateParking> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Tarifa Dias:',
-                                            style: TextStyle(fontSize: 16)),
+                                        const Text(
+                                          'Tarifa Dias:',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                         const SizedBox(height: 5),
                                         Row(
                                           children: [
@@ -480,8 +495,10 @@ class _UpdateParkingState extends State<UpdateParking> {
                             const SizedBox(height: 10),
                             const Padding(
                               padding: EdgeInsets.only(left: 16.0, top: 10),
-                              child:
-                                  Text('Otros', style: TextStyle(fontSize: 20)),
+                              child: Text(
+                                'Otros',
+                                style: TextStyle(fontSize: 20),
+                              ),
                             ),
                             const SizedBox(height: 10),
                             Row(
@@ -494,8 +511,10 @@ class _UpdateParkingState extends State<UpdateParking> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Tarifa Horas:',
-                                            style: TextStyle(fontSize: 16)),
+                                        const Text(
+                                          'Tarifa Horas:',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                         const SizedBox(height: 5),
                                         Row(
                                           children: [
@@ -540,8 +559,10 @@ class _UpdateParkingState extends State<UpdateParking> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text('Tarifa Dias:',
-                                            style: TextStyle(fontSize: 16)),
+                                        const Text(
+                                          'Tarifa Dias:',
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                         const SizedBox(height: 5),
                                         Row(
                                           children: [
@@ -684,7 +705,8 @@ class _UpdateParkingState extends State<UpdateParking> {
                               backgroundColor: Colors.red,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
-                                    30.0), // Ajusta el radio para hacerlo semi redondeado
+                                  30.0,
+                                ), // Ajusta el radio para hacerlo semi redondeado
                               ), // Cambia el color de fondo del botón
                             ),
                             onPressed: () {
@@ -698,10 +720,11 @@ class _UpdateParkingState extends State<UpdateParking> {
                               backgroundColor: Colors.red,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(
-                                    30.0), // Ajusta el radio para hacerlo semi redondeado
+                                  30.0,
+                                ), // Ajusta el radio para hacerlo semi redondeado
                               ), // Cambia el color de fondo del botón
                             ),
-                            onPressed: () async{
+                            onPressed: () async {
                               // Acción para el botón "Confirmar"
                               // Puedes agregar aquí la lógica para confirmar los horarios
                               await ProgressDialog.show(context,

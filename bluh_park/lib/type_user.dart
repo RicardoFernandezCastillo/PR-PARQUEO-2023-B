@@ -8,18 +8,21 @@ import 'utilities/toast.dart' show Toast;
 
 class TypeUser extends StatelessWidget {
   final UserData userData;
-  const TypeUser({
-    Key? key,
-    required this.userData,
-  }) : super(key: key);
+
+  const TypeUser({Key? key, required this.userData,}) : super(key: key,);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 80,
+        centerTitle: true,
         title: const Text(
           'Tipo de Cuenta',
-          style: TextStyle(fontSize: 25),
+          style: TextStyle(
+            fontSize: 35,
+            fontFamily: 'Urbanist',
+          ),
         ),
         leading: IconButton(
           icon: const Icon(
@@ -39,7 +42,7 @@ class TypeUser extends StatelessWidget {
           children: [
             Container(
               margin: const EdgeInsets.only(
-                  top: 100), // Espacio de 20 puntos en la parte superior
+                  top: 150), // Espacio de 20 puntos en la parte superior
               child: Center(
                 child: ElevatedButton(
                   onPressed: () async {
@@ -72,6 +75,8 @@ class TypeUser extends StatelessWidget {
                         'Cliente',
                         style: TextStyle(
                           fontSize: 45,
+                          fontFamily: 'Urbanist',
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
@@ -80,6 +85,7 @@ class TypeUser extends StatelessWidget {
                         'Usuario común - Realiza    ',
                         style: TextStyle(
                           fontSize: 18,
+                          fontFamily: 'Urbanist',
                           color: Colors.white,
                         ),
                       ),
@@ -87,6 +93,7 @@ class TypeUser extends StatelessWidget {
                         'reserva de parqueos',
                         style: TextStyle(
                           fontSize: 18,
+                          fontFamily: 'Urbanist',
                           color: Colors.white,
                         ),
                       ),
@@ -97,7 +104,8 @@ class TypeUser extends StatelessWidget {
             ),
             Container(
               margin: const EdgeInsets.only(
-                  top: 100), // Espacio de 20 puntos en la parte superior
+                top: 100,
+              ), // Espacio de 20 puntos en la parte superior
               child: Center(
                 child: ElevatedButton(
                   onPressed: () async {
@@ -109,8 +117,8 @@ class TypeUser extends StatelessWidget {
                       await registerUser(userData, context);
 
                       // ignore: use_build_context_synchronously
-                      ProgressDialog.hide(
-                          context); // Oculta el diálogo de progreso después de completar la tarea
+                      ProgressDialog.hide(context);
+                      // ignore: use_build_context_synchronously
                     } catch (e) {
                       // ignore: use_build_context_synchronously
                       ProgressDialog.hide(
@@ -134,6 +142,8 @@ class TypeUser extends StatelessWidget {
                         'Dueño',
                         style: TextStyle(
                           fontSize: 45,
+                          fontFamily: 'Urbanist',
+                          fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
@@ -142,6 +152,7 @@ class TypeUser extends StatelessWidget {
                         'Usuario Gestor - Realiza la',
                         style: TextStyle(
                           fontSize: 18,
+                          fontFamily: 'Urbanist',
                           color: Colors.white,
                         ),
                       ),
@@ -149,6 +160,7 @@ class TypeUser extends StatelessWidget {
                         'gestion de su parqueo',
                         style: TextStyle(
                           fontSize: 18,
+                          fontFamily: 'Urbanist',
                           color: Colors.white,
                         ),
                       ),
@@ -192,12 +204,12 @@ Future<void> registerUser(UserData userData, BuildContext context) async {
       // Registro exitoso, puedes mostrar un mensaje o redirigir al usuario a otra pantalla.
     } else {
       // Handle error: usuario no creado correctamente
-      // ignore: use_build_context_synchronously  
-      Toast.show(context,'Usuario no creado correctamente');
+      // ignore: use_build_context_synchronously
+      Toast.show(context, 'Usuario no creado correctamente');
     }
   } catch (error) {
     // Handle any registration errors here
     // ignore: use_build_context_synchronously
-    Toast.show(context,'$error'.toString());
+    Toast.show(context, '$error'.toString());
   }
 }

@@ -35,10 +35,13 @@ dependencies:
     sdk: flutter
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  image_picker: ^0.8.4+4
+  permission_handler: ^10.2.0
   cupertino_icons: ^1.0.2
   firebase_core: ^2.3.0
   cloud_firestore: ^4.1.0
   firebase_auth: ^4.9.0
+  firebase_storage: ^11.2.8
   
 dev_dependencies:
   flutter_test:
@@ -63,6 +66,13 @@ flutter:
   assets: 
         - assets/img_parqueo.jpg
         - assets/img_parking_reserve.jpg
+        - assets/logo_login.jpg
+  fonts: 
+        - family: Urbanist
+          fonts:
+                - asset: fonts/Urbanist/Urbanist-VariableFont_wght.ttf
+                - asset: fonts/Urbanist/Urbanist-Italic-VariableFont_wght.ttf
+                  weight: 800 
   uses-material-design: true
   
   # To add assets to your application, add an assets section, like this:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_create_account/models/inkwell/inkwell_data.dart';
 import 'package:flutter_create_account/utilities/inkwell_personalized.dart';
+import 'package:flutter_create_account/utilities/toast.dart';
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
@@ -31,55 +32,69 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
     if (pickedDate != null) {
       // ignore: use_build_context_synchronously
       final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: selectedTime[0] ?? TimeOfDay.now(),
-      );
+          helpText: 'Seleccione la hora',
+          context: context,
+          initialTime:
+              TimeOfDay.fromDateTime(selectedDate[0] ?? DateTime.now()));
       if (pickedTime != null) {
-        setState(() {
-          selectedDate[0] = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-          selectedTime[0] = pickedTime;
-        });
+        if ((pickedTime.hour > 6 && pickedTime.hour < 22)) {
+          if ((pickedTime.minute == 0 && pickedTime.hour == 22 - 1) || (pickedTime.hour != 22 - 1)) {
+            setState(() {
+              selectedDate[0] = DateTime(
+                pickedDate.year,
+                pickedDate.month,
+                pickedDate.day,
+                pickedTime.hour,
+                pickedTime.minute,
+              );
+              selectedTime[0] = pickedTime;
+            });
+          }
+        } else {
+          Toast.show(context, 'Horario no disponible');
+        }
       }
     }
   }
 
   Future<void> _selectDateAndTimeFinal(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
+      helpText: 'Seleccione una fecha',
       context: context,
       initialDate:
           selectedDate[0] ?? DateTime.now().add(const Duration(hours: 1)),
       firstDate:
           selectedDate[0] ?? DateTime.now().add(const Duration(hours: 1)),
-      lastDate: selectedDate[0] ?? DateTime.now().add(const Duration(days: 20)),
+      lastDate: selectedDate[0]?.add(const Duration(days: 20)) ??
+          DateTime.now().add(const Duration(days: 20)),
     );
     if (pickedDate != null) {
       // ignore: use_build_context_synchronously
       final TimeOfDay? pickedTime = await showTimePicker(
+          helpText: 'Seleccione la hora',
           context: context,
           initialTime:
               TimeOfDay.fromDateTime(selectedDate[0] ?? DateTime.now()));
       if (pickedTime != null) {
-        setState(() {
-          selectedDate[1] = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-          selectedTime[1] = pickedTime;
-        });
+        if (pickedTime.hour > 6 && pickedTime.hour < 22) {
+          setState(() {
+            selectedDate[1] = DateTime(
+              pickedDate.year,
+              pickedDate.month,
+              pickedDate.day,
+              pickedTime.hour,
+              pickedTime.minute,
+            );
+            selectedTime[1] = pickedTime;
+          });
+        } else {
+          Toast.show(context, 'Horario no disponible');
+        }
       }
     }
   }
 
-  @override
+  @override  
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -354,7 +369,15 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       InkWell(
-                        onTap: () => _selectDateAndTimeFinal(context),
+                        onTap: () => {
+                          if (selectedDate[0] != null)
+                            {_selectDateAndTimeFinal(context)}
+                          else
+                            {
+                              Toast.show(context,
+                                  'Primero seleccione la fecha inicial')
+                            }
+                        },
                         child: Row(
                           children: [
                             const Icon(
@@ -422,6 +445,5 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
 
   void searchParking(DateTime selectedDate) {
     var selected = selectedDate;
-
   }
 }
