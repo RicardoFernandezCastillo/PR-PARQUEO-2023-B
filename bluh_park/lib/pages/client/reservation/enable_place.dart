@@ -46,7 +46,7 @@ class _PlazaListScreenState extends State<PlazaListScreen> {
           }
 
           // Obtén la lista de plazas
-          List<Plaza> parqueos =
+          List<Plaza> plazas =
               snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;// Obtener el ID del documento
             return Plaza(
@@ -57,9 +57,9 @@ class _PlazaListScreenState extends State<PlazaListScreen> {
           }).toList();
 
           return ListView.builder(
-            itemCount: parqueos.length,
+            itemCount: plazas.length,
             itemBuilder: (context, index) {
-              final parqueo = parqueos[index];
+              final plaza = plazas[index];
               return InkWell(
                 onTap: () {
                   // Implementa aquí la lógica que se realizará al hacer clic en el elemento.
@@ -71,12 +71,12 @@ class _PlazaListScreenState extends State<PlazaListScreen> {
                       vertical: 8.0, horizontal: 16.0),
                   child: ListTile(
                     title: Text(
-                      parqueo.nombre,
+                      plaza.nombre,
                       style: const TextStyle(
                           fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
-                      parqueo.tieneCobertura
+                      plaza.tieneCobertura
                           ? 'Con Cobertura'
                           : 'Sin Cobertura',
                       style: const TextStyle(fontSize: 16.0),
@@ -278,7 +278,7 @@ Stream<QuerySnapshot> getSpaces() async* {
           .collection('filas')
           .doc(filaDocument.id)
           .collection('plazas')
-          .where('estado', isEqualTo: 'disponible').where('tieneCobertura', isEqualTo: true).where('tipoVehiculo', isEqualTo: 'Moto')
+          .where('estado', isEqualTo: 'disponible').where('tieneCobertura', isEqualTo: true).where('tipoVehiculo', isEqualTo: 'Automóvil')
           .snapshots();
 
       // Utiliza 'async* {}' para emitir los resultados en el Stream

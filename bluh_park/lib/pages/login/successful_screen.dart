@@ -1,6 +1,6 @@
+import 'package:bluehpark/pages/owner/place/create_place.dart';
 import 'package:flutter/material.dart';
 
-import '../parking_space/create_place.dart';
 
 class SuccessfulScreen extends StatelessWidget {
   const SuccessfulScreen({Key? key}) : super(key: key);

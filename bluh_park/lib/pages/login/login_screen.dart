@@ -1,17 +1,18 @@
-import 'dart:developer';
-
+import 'package:bluehpark/pages/client/home_client_page.dart';
+import 'package:bluehpark/pages/owner/home_owner_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'successful_screen.dart';
 
-class SignupScreen extends StatelessWidget {
-  static const routeName = '/signup-screen';
+class LoginScreen extends StatelessWidget {
+  static const routeName = '/login-screen';
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  SignupScreen({super.key});
+  LoginScreen({super.key});
 
-  Widget signUpWith(IconData icon) {
+  Widget login(IconData icon) {
     return Container(
       height: 50,
       width: 115,
@@ -23,7 +24,7 @@ class SignupScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 24),
-          TextButton(onPressed: () {}, child: const Text('Sign in')),
+          TextButton(onPressed: () {}, child: const Text('Login')),
         ],
       ),
     );
@@ -43,7 +44,7 @@ class SignupScreen extends StatelessWidget {
           controller: userInput,
           autocorrect: false,
           enableSuggestions: false,
-          autofocus: false,
+          autofocus: true,
           decoration: InputDecoration.collapsed(
             hintText: hintTitle,
             hintStyle: const TextStyle(
@@ -66,7 +67,7 @@ class SignupScreen extends StatelessWidget {
             alignment: Alignment.topCenter,
             fit: BoxFit.fill,
             image: NetworkImage(
-              'https://www.teahub.io/photos/full/246-2460189_full-hd-background-abstract-portrait.jpg',
+              'https://voyage-onirique.com/wp-content/uploads/2020/01/656579-1120x630.jpg',
             ),
           ),
         ),
@@ -103,25 +104,46 @@ class SignupScreen extends StatelessWidget {
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25)),
+                          backgroundColor: Colors.blue[900]
                           //color: Colors.indigo.shade800,
                         ),
                         onPressed: () async {
-                          //print(emailController);
-                          //print(passwordController);
-
-                          //Provider.of<Auth>(context, listen: false).signup(emailController.text, passwordController.text);
                           var credential = await auntenticator(
                               emailController.text, passwordController.text);
 
                           if (credential != null) {
+                            var id = credential.user!.uid;
+                            DocumentReference userReference = FirebaseFirestore.instance
+                                .collection('user')
+                                .doc(id);
+                            DocumentSnapshot<Map<String, dynamic>> user =
+                            await userReference.get() as DocumentSnapshot<Map<String, dynamic>>;
+                            if (!context.mounted) return;
                             // Autenticación exitosa, puedes navegar a la siguiente pantalla
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SuccessfulScreen(),
-                              ),
-                            );
+                            if(user['tipo']=="Cliente"){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const HomeClient(),
+                                ),
+                              );
+                            }
+                            else if (user['tipo']=="Dueño"){
+                                Navigator.push(
+                                context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const HomeOwner(),
+                                  ),
+                                );
+                            }
+                            else if (user['tipo']=="Admin"){
+
+                            }
+
+
+
                           } else {
+                              if (!context.mounted) return;
                             // Autenticación fallida, muestra un mensaje de error
                             showDialog(
                               context: context,
@@ -140,6 +162,9 @@ class SignupScreen extends StatelessWidget {
                               ),
                             );
                           }
+
+                          /*Navigator.of(context).push(MaterialPageRoute(
+                              builder: (ctx) => const SuccessfulScreen()));*/
                         },
                         child: const Text(
                           'Iniciar Sesión',
@@ -153,7 +178,7 @@ class SignupScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     const Center(
-                      child: Text('Olvidó su contraseña ?'),
+                      child: Text('Forgot password ?'),
                     ),
                     const SizedBox(height: 20),
                     Padding(
@@ -161,27 +186,27 @@ class SignupScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          signUpWith(Icons.add),
-                          signUpWith(Icons.book_online),
+                          login(Icons.add),
+                          login(Icons.book_online),
                         ],
                       ),
                     ),
                     const Divider(thickness: 0, color: Colors.white),
                     /*
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          //Text('Don\'t have an account yet ? ', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),),
-                          TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Sign Up',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                          ),
-                        ),
-                        ],
-                      ),
-                    */
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    //Text('Don\'t have an account yet ? ', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),),
+                    TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Sign Up',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  ],
+                ),
+                  */
                   ],
                 ),
               ),
@@ -200,10 +225,7 @@ Future<UserCredential?> auntenticator(var user, var password) async {
     return credential;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
-      log('No user found for that email.');
-    } else if (e.code == 'wrong-password') {
-      log('Wrong password provided for that user.');
-    }
+    } else if (e.code == 'wrong-password') {}
     return null; // Devuelve null en caso de error.
   }
 }

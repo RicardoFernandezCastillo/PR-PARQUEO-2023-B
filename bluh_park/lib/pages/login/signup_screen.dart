@@ -1,16 +1,17 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'successful_screen.dart';
 
-class LoginScreen extends StatelessWidget {
-  static const routeName = '/login-screen';
-
+class SignupScreen extends StatelessWidget {
+  static const routeName = '/signup-screen';
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  LoginScreen({super.key});
+  SignupScreen({super.key});
 
-  Widget login(IconData icon) {
+  Widget signUpWith(IconData icon) {
     return Container(
       height: 50,
       width: 115,
@@ -22,7 +23,7 @@ class LoginScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, size: 24),
-          TextButton(onPressed: () {}, child: const Text('Login')),
+          TextButton(onPressed: () {}, child: const Text('Sign in')),
         ],
       ),
     );
@@ -42,7 +43,7 @@ class LoginScreen extends StatelessWidget {
           controller: userInput,
           autocorrect: false,
           enableSuggestions: false,
-          autofocus: true,
+          autofocus: false,
           decoration: InputDecoration.collapsed(
             hintText: hintTitle,
             hintStyle: const TextStyle(
@@ -65,7 +66,7 @@ class LoginScreen extends StatelessWidget {
             alignment: Alignment.topCenter,
             fit: BoxFit.fill,
             image: NetworkImage(
-              'https://voyage-onirique.com/wp-content/uploads/2020/01/656579-1120x630.jpg',
+              'https://www.teahub.io/photos/full/246-2460189_full-hd-background-abstract-portrait.jpg',
             ),
           ),
         ),
@@ -103,11 +104,13 @@ class LoginScreen extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(25)),
                           //color: Colors.indigo.shade800,
+                          backgroundColor: Colors.blue[900]
                         ),
                         onPressed: () async {
                           //print(emailController);
                           //print(passwordController);
 
+                          //Provider.of<Auth>(context, listen: false).signup(emailController.text, passwordController.text);
                           var credential = await auntenticator(
                               emailController.text, passwordController.text);
 
@@ -138,9 +141,6 @@ class LoginScreen extends StatelessWidget {
                               ),
                             );
                           }
-
-                          /*Navigator.of(context).push(MaterialPageRoute(
-                              builder: (ctx) => const SuccessfulScreen()));*/
                         },
                         child: const Text(
                           'Iniciar Sesión',
@@ -154,7 +154,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     const Center(
-                      child: Text('Forgot password ?'),
+                      child: Text('Olvidó su contraseña ?'),
                     ),
                     const SizedBox(height: 20),
                     Padding(
@@ -162,27 +162,27 @@ class LoginScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          login(Icons.add),
-                          login(Icons.book_online),
+                          signUpWith(Icons.add),
+                          signUpWith(Icons.book_online),
                         ],
                       ),
                     ),
                     const Divider(thickness: 0, color: Colors.white),
                     /*
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    //Text('Don\'t have an account yet ? ', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),),
-                    TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                  ),
-                  ],
-                ),
-                  */
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          //Text('Don\'t have an account yet ? ', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),),
+                          TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            'Sign Up',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                          ),
+                        ),
+                        ],
+                      ),
+                    */
                   ],
                 ),
               ),
@@ -201,7 +201,10 @@ Future<UserCredential?> auntenticator(var user, var password) async {
     return credential;
   } on FirebaseAuthException catch (e) {
     if (e.code == 'user-not-found') {
-    } else if (e.code == 'wrong-password') {}
+      log('No user found for that email.');
+    } else if (e.code == 'wrong-password') {
+      log('Wrong password provided for that user.');
+    }
     return null; // Devuelve null en caso de error.
   }
 }

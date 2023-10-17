@@ -1,14 +1,17 @@
-import 'package:bluehpark/screens/User/Parking/enable_place.dart';
-import 'package:bluehpark/screens/User/Parking/nearby_parking.dart';
+import 'package:bluehpark/pages/login/login_screen.dart';
+import 'package:bluehpark/pages/login/register.dart';
+import 'package:bluehpark/pages/login/signup_screen.dart';
+import 'package:bluehpark/pages/login/welcome_screen.dart';
+import 'package:bluehpark/pages/owner/parking/registroParqueo.dart';
+import 'package:bluehpark/pages/client/reservation/search_parking_spaces.dart';
+import 'package:bluehpark/pages/client/reservation/enable_place.dart';
+import 'package:bluehpark/pages/client/reservation/nearby_parking.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bluehpark/firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'screens/Login/login_screen.dart';
-import 'screens/Login/signup_screen.dart';
-import 'screens/Login/welcome_screen.dart';
-import './Models/auth.dart';
-import './screens/parking_space/create_place.dart';
+import 'models/auth.dart';
+import 'pages/owner/place/create_place.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,14 +33,21 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorSchemeSeed: const Color.fromARGB(255, 2, 51, 135)
         ),
-        home: CreatePlaceScreen(),
+        home: WelcomeScreen(),
         routes: {
+          RegisterScreen.routeName: (context) => const RegisterScreen(),
           WelcomeScreen.routeName: (context) => WelcomeScreen(),
           SignupScreen.routeName: (context) => SignupScreen(),
           LoginScreen.routeName: (context) => LoginScreen(),
+          
           CreatePlaceScreen.routeName: (context) => const CreatePlaceScreen(),
           SelectParkingScreen.routeName:(context) => const SelectParkingScreen(),
           SelectSpaceScreen.routeName:(context) => const SelectSpaceScreen(),
+
+          RegistroParqueoScreen.routeName: (context) => const RegistroParqueoScreen(),
+
+
+          SearchPlaceScreen.routeName:(context) => const SearchPlaceScreen(),
         },
       ),
     );
