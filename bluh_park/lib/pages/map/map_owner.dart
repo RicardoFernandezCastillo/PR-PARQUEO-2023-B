@@ -34,7 +34,7 @@ class _MapOwnerState extends State<MapOwner> {
         stream: getParkingsByOwner('adjofsdfondsd'),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
@@ -260,17 +260,6 @@ Widget ItenDetail(
               ],
             ),
           ),
-          MaterialButton(
-            padding: EdgeInsets.zero,
-            onPressed: () {},
-            color: Colors.blue,
-            elevation: 6,
-            child: const Text(
-              'Reservar',
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          )
         ],
       ),
     ),

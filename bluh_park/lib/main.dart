@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:bluh_park/pages/client/navigation_bar.dart';
 import 'package:bluh_park/pages/map/map_client.dart';
 import 'package:bluh_park/pages/map/map_owner.dart';
@@ -29,8 +31,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routes: {
-        '/': (context) => const MapClient(),
-        '/map/client': (context) => const MapOwner(),
+        '/': (context) => const MenuOwner(),
+        '/map/client': (context) => const MapClient(),
         '/home/owner': (context) => const MenuOwner(),
         '/home/client': (context) => const MenuClient(),
         '/seccion/create': (context) => const SeccionCreate(),
