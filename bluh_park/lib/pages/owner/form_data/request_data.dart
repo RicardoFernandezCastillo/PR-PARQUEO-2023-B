@@ -44,7 +44,7 @@ class FormAccountScreenState extends State<RequetFormScreen> {
     if (user != null) {
       // El usuario ha iniciado sesión y user contiene la información del usuario.
       correoElectronicoController.text = user.email.toString();
-      uidGoogle = user.uid.toString();
+      uidGoogle = user.uid.toString(); //Id del usuario en la coleccion 'usuarios'
       correoGoogle = user.email.toString();
       log('El usuario está autenticado: ${user.displayName}');
     } else {

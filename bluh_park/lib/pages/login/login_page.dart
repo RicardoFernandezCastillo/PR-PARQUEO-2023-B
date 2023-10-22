@@ -1,14 +1,12 @@
 import 'package:bluehpark/components/my_textfield.dart';
-import 'package:bluehpark/components/square_tile.dart';
 import 'package:bluehpark/models/auth/auth_service.dart';
 import 'package:bluehpark/models/coleccion/collection_field.dart';
 import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/pages/administrator/accounts_request.dart';
-import 'package:bluehpark/pages/client/home_client_page.dart';
+import 'package:bluehpark/pages/client/navigation_bar.dart';
 import 'package:bluehpark/pages/login/login_screen.dart';
-import 'package:bluehpark/pages/owner/form_data/request_data.dart';
 import 'package:bluehpark/pages/owner/form_data/request_type.dart';
-import 'package:bluehpark/pages/owner/home_owner_page.dart';
+import 'package:bluehpark/pages/owner/navigation_bar.dart';
 import 'package:bluehpark/utilities/progressbar.dart';
 import 'package:bluehpark/utilities/toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -110,7 +108,7 @@ class LoginPage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const HomeClient(),
+                                  builder: (context) => const MenuClient(),
                                 ),
                               );
                             }
@@ -118,7 +116,7 @@ class LoginPage extends StatelessWidget {
                                 Navigator.push(
                                 context,
                                   MaterialPageRoute(
-                                    builder: (context) => const HomeOwner(),
+                                    builder: (context) => const MenuOwner(),
                                   ),
                                 );
                             }
@@ -233,7 +231,7 @@ class LoginPage extends StatelessWidget {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const HomeClient(),
+                                        builder: (context) => const MenuClient(),
                                       ),
                                     );
                                   }
@@ -244,7 +242,7 @@ class LoginPage extends StatelessWidget {
                                         Navigator.push(
                                         context,
                                           MaterialPageRoute(
-                                            builder: (context) => const HomeOwner(),
+                                            builder: (context) => const MenuOwner(),
                                           ),
                                         );
                                     }

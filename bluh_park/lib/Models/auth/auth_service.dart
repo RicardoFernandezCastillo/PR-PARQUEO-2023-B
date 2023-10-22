@@ -1,6 +1,4 @@
 import 'dart:developer';
-import 'package:bluehpark/models/coleccion/collection_field.dart';
-import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

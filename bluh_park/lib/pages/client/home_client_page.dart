@@ -1,3 +1,4 @@
+import 'package:bluehpark/pages/map/map_client.dart';
 import 'package:flutter/material.dart';
 
 class HomeClient extends StatelessWidget {
@@ -101,25 +102,33 @@ class HomeClient extends StatelessWidget {
               top: 340,
               left: 0,
               right: 0,
-              child: Card(
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(horizontal: 40),
-                child: Container(
-                  height: 350,
-                  padding: const EdgeInsets.all(16),
-                  child: const Column(
-                    children: [
-                      ListTile(
-                        title: Text("Ubicación Mis Parqueos"),
-                      ),
-                      SizedBox(
-                        height: 200,
-                        child: Text(
-                          "Mapa",
-                          textAlign: TextAlign.center,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MapClient()));
+                },
+                child: Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Container(
+                    height: 100,
+                    padding: const EdgeInsets.all(16),
+                    child: const Column(
+                      children: [
+                        ListTile(
+                          title: Text("Ubicación Mis Parqueos"),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: 200,
+                          child: Text(
+                            "Mapa",
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

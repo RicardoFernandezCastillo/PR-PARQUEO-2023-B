@@ -48,7 +48,7 @@ class _MapClientState extends State<MapClient> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Parqueos Registrados',
+        title: const Text('Todos los Parqueos',
             style: TextStyle(fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.blue,
       ),
@@ -56,7 +56,7 @@ class _MapClientState extends State<MapClient> {
         stream: getAllParkings(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {

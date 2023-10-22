@@ -156,7 +156,7 @@ Future<void> editarPlaza(String idParqueo, String idPiso, String idFila,
     await plazaDocRef.update(
         datos); // Utiliza update para modificar campos existentes o set con merge: true
   } catch (e) {
-    print('Error al editar la plaza: $e');
+    log('Error al editar la plaza: $e');
   }
 }
 

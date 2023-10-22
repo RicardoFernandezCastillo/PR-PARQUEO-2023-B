@@ -9,7 +9,6 @@ void main() => runApp(const SeccionList());
 // ignore: must_be_immutable
 class SeccionList extends StatefulWidget {
   const SeccionList({super.key});
-
   @override
   State<SeccionList> createState() => _SeccionListState();
 }

@@ -1,3 +1,4 @@
+import 'package:bluehpark/pages/map/map_owner.dart';
 import 'package:flutter/material.dart';
 
 class HomeOwner extends StatefulWidget {
@@ -186,19 +187,33 @@ class _HomeOwnerState extends State<HomeOwner> {
               top: 640,
               left: 0,
               right: 0,
-              child: Card(
-                elevation: 4,
-                margin: const EdgeInsets.symmetric(horizontal: 40),
-                child: Container(
-                  height: 550,
-                  padding: const EdgeInsets.all(16),
-                  child: const Column(
-                    children: [
-                      ListTile(
-                        title: Text("Ubicación Mis Parqueos"),
-                      ),
-                      //SizedBox(child: MapOwner()),
-                    ],
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MapOwner()));
+                },
+                child: Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Container(
+                    height: 100,
+                    padding: const EdgeInsets.all(16),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ListTile(
+                          title: Text(
+                            "Ubicación Mis Parqueos",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        //SizedBox(child: MapOwner()),
+                      ],
+                    ),
                   ),
                 ),
               ),
