@@ -1,7 +1,6 @@
-import 'package:bluehpark/pages/login/login_screen.dart';
-import 'package:bluehpark/pages/login/register.dart';
+import 'package:bluehpark/pages/login/type_user.dart';
+import 'package:bluehpark/pages/login/login_page.dart';
 import 'package:flutter/material.dart';
-import 'signup_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   static const routeName = '/welcome-screen';
@@ -75,7 +74,7 @@ class WelcomeScreen extends StatelessWidget {
                           const EdgeInsets.only(top: 25, left: 24, right: 24),
                       child: ElevatedButton(
                         onPressed: () => Navigator.of(context)
-                            .pushNamed(LoginScreen.routeName),
+                            .pushNamed(LoginPage.routeName),
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(25),
@@ -108,7 +107,14 @@ class WelcomeScreen extends StatelessWidget {
                           ),
                           //color: Colors.white,
                         ),
-                        onPressed: () => Navigator.of(context).pushNamed(RegisterScreen.routeName),
+                        onPressed: () => {
+                              Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const TypeUser(),
+                              ),
+                            )
+                        },
                         child: const Text(
                           'Crear Cuenta',
                           style: TextStyle(

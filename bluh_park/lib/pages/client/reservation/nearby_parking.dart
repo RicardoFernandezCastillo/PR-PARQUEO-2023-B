@@ -1,4 +1,5 @@
-import 'package:bluehpark/Models/parking.dart';
+import 'dart:developer';
+import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -28,10 +29,10 @@ class PlazaListScreen extends StatefulWidget {
   const PlazaListScreen({super.key});
 
   @override
-  _PlazaListScreenState createState() => _PlazaListScreenState();
+  PlazaListScreenState createState() => PlazaListScreenState();
 }
 
-class _PlazaListScreenState extends State<PlazaListScreen> {
+class PlazaListScreenState extends State<PlazaListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,7 +170,7 @@ Future<void> editarPlaza(String idParqueo, String idPiso, String idFila,
     await plazaDocRef.update(
         datos); // Utiliza update para modificar campos existentes o set con merge: true
   } catch (e) {
-    print('Error al editar la plaza: $e');
+    log('Error al editar la plaza: $e');
   }
 }
 
@@ -195,7 +196,7 @@ Future<List<Plaza>> getPlaces(
 
     return plazas;
   } catch (e) {
-    print('Error al obtener las plazas: $e');
+    log('Error al obtener las plazas: $e');
     return [];
   }
 }
@@ -214,8 +215,8 @@ Stream<QuerySnapshot> obtenerPlazasStream(
     return plazasCollection
         .snapshots(); // Devuelve un Stream que escucha cambios en la colección.
   } catch (e) {
-    print('Error al obtener el Stream de plazas: $e');
-    throw e;
+    log('Error al obtener el Stream de plazas: $e');
+    rethrow;
   }
 }
 
@@ -226,7 +227,7 @@ Stream<QuerySnapshot> getParking() {
     return parkingCollection
         .snapshots(); // Devuelve un Stream que escucha cambios en la colección.
   } catch (e) {
-    print('Error al obtener el Stream de parqueos: $e');
+    log('Error al obtener el Stream de parqueos: $e');
     rethrow;
   }
 }

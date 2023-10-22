@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'package:bluehpark/models/coleccion/collection_field.dart';
 import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/models/user.dart';
+import 'package:bluehpark/pages/client/home_client_page.dart';
 import 'package:bluehpark/pages/login/welcome_screen.dart';
 import 'package:bluehpark/utilities/progressbar.dart';
 import 'package:bluehpark/utilities/toast.dart';
@@ -9,16 +11,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class RegisterScreen extends StatefulWidget {
-  static const routeName = '/Register-screen';
+class RequetFormScreen extends StatefulWidget {
+  static const routeName = '/Register-screen-request';
   final String userType;
-  const RegisterScreen({Key? key, required this.userType}) : super(key: key);
+  const RequetFormScreen({Key? key, required this.userType}) : super(key: key);
 
   @override
-  RegisterScreenState createState() => RegisterScreenState();
+  FormAccountScreenState createState() => FormAccountScreenState();
 }
 
-class RegisterScreenState extends State<RegisterScreen> {
+class FormAccountScreenState extends State<RequetFormScreen> {
   int selectedGender = 0; // 0 para Hombre, 1 para Mujer
   final TextEditingController nombreController = TextEditingController();
   final TextEditingController apellidosController = TextEditingController();
@@ -28,6 +30,28 @@ class RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController contrasenaConfirmarController =
       TextEditingController();
   final TextEditingController telefonoController = TextEditingController();
+  String uidGoogle = "";
+  String correoGoogle = "";
+  @override
+  void initState() {
+    super.initState();
+    getUserData();
+    // Carga los datos de la plaza en initState
+  }
+
+  Future<void> getUserData() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // El usuario ha iniciado sesión y user contiene la información del usuario.
+      correoElectronicoController.text = user.email.toString();
+      uidGoogle = user.uid.toString();
+      correoGoogle = user.email.toString();
+      log('El usuario está autenticado: ${user.displayName}');
+    } else {
+      // El usuario no ha iniciado sesión.
+      log('El usuario no está autenticado');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +66,11 @@ class RegisterScreenState extends State<RegisterScreen> {
             Padding(
               padding: const EdgeInsetsDirectional.all(20),
               child: IconButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                },
                 icon: const Icon(
                   Icons.arrow_back,
                   size: 40,
@@ -53,7 +81,7 @@ class RegisterScreenState extends State<RegisterScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(40),
                 child: Image.asset(
-                  'assets/logo_login.jpg',
+                  '../../images/logos/bluhpark-logo_5-app.jpg',
                   width: 215,
                   height: 190,
                   fit: BoxFit.cover,
@@ -143,6 +171,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 20),
                       TextField(
                         controller: correoElectronicoController,
+                        readOnly: true,
                         style: const TextStyle(
                             fontFamily: 'Urbanist',
                             fontWeight: FontWeight.bold),
@@ -240,32 +269,55 @@ class RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 30),
                       ElevatedButton(
                         onPressed: () async {
-                          if(widget.userType == 'Cliente'){
+                            UserData userData = sendUserData(widget.userType);
+                            userData.id = uidGoogle;
 
-                          }
-                          else if(widget.userType == 'Dueño'){
+                            if (widget.userType == 'Cliente') {
+                              // Acción cuando se presiona el botón
+                              try {
+                                if (!context.mounted) return;
+                                ProgressDialog.show(
+                                    context, 'Registrando usuario...');
+                                if (!context.mounted) return;
+                                await registerUser(userData, context);
 
-                          }
-                          UserData userData = sendUserData(widget.userType);
-                                            // Acción cuando se presiona el botón
-                          try {
-                            ProgressDialog.show(context, 'Registrando usuario...');
-                            await registerUser(userData, context);
+                                // ignore: use_build_context_synchronously
+                                ProgressDialog.hide(context);
+                                if (!context.mounted) return;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                      const HomeClient(),
+                                  ),
+                                );
+                              } catch (e) {
+                                // ignore: use_build_context_synchronously
+                                Toast.show(context, e.toString());
+                              }
+                            } else if (widget.userType == 'Dueño') {
+                              try {
+                                if (!context.mounted) return;
+                                ProgressDialog.show(
+                                    context, 'Registrando usuario...');
+                                if (!context.mounted) return;
+                                await ownerRequestAccount(userData, context);
 
-                            // ignore: use_build_context_synchronously
-                            ProgressDialog.hide(context);
-                            if (!context.mounted) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                  WelcomeScreen(),
-                              ),
-                            );
-                          } catch (e) {
-                            // ignore: use_build_context_synchronously
-                            Toast.show(context, e.toString());
-                          }
+                                // ignore: use_build_context_synchronously
+                                ProgressDialog.hide(context);
+                                if (!context.mounted) return;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                    WelcomeScreen(),
+                                  ),
+                                );
+                              } catch (e) {
+                                // ignore: use_build_context_synchronously
+                                Toast.show(context, e.toString());
+                              }
+                            }
                         },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -298,7 +350,7 @@ class RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  UserData sendUserData(String userType){
+  UserData sendUserData(String userType) {
     UserData userData = UserData(
         nombre: nombreController.text,
         apellidos: apellidosController.text,
@@ -314,39 +366,18 @@ class RegisterScreenState extends State<RegisterScreen> {
 
 Future<void> registerUser(UserData userData, BuildContext context) async {
   try {
-    UserCredential userCredential =
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: userData
-          .correoElectronico, // Reemplaza con el valor del correo electrónico del usuario
-      password: userData.contrasena, // Reemplaza con la contraseña del usuario
-    );
-
-    // Verifica si la creación de usuario fue exitosa
-
-    if (userCredential.user != null) {
-      String userId = userCredential.user!.uid; // Obtiene el ID del usuario
-
-      // Ahora puedes agregar datos adicionales a la colección en Firestore
-      await FirebaseFirestore.instance
-          .collection(Collection.usuarios)
-          .doc(userId)
-          .set({
-        UsersCollection.nombre: userData.nombre,
-        UsersCollection.apellidos: userData.apellidos,
-        UsersCollection.telefono: userData.telefono,
-        UsersCollection.correo: userData.correoElectronico,
-        UsersCollection.genero: userData.genero,
-        UsersCollection.tipo: userData.typeUser,
-        UsersCollection.estado: 'habilitado'
-        // Agrega otros campos de datos aquí
-      });
-
-      // Registro exitoso, puedes mostrar un mensaje o redirigir al usuario a otra pantalla.
-    } else {
-      // Handle error: usuario no creado correctamente
-      // ignore: use_build_context_synchronously
-      Toast.show(context, 'Usuario no creado correctamente');
-    }
+    await FirebaseFirestore.instance
+        .collection(Collection.usuarios)
+        .doc(userData.id)
+        .set({
+      UsersCollection.nombre: userData.nombre,
+      UsersCollection.apellidos: userData.apellidos,
+      UsersCollection.correo: userData.correoElectronico,
+      UsersCollection.telefono: userData.telefono,
+      UsersCollection.genero: userData.genero,
+      UsersCollection.tipo: userData.typeUser,
+      UsersCollection.estado: 'habilitado'
+    });
   } catch (error) {
     // Handle any registration errors here
     // ignore: use_build_context_synchronously
@@ -357,10 +388,9 @@ Future<void> registerUser(UserData userData, BuildContext context) async {
 Future<void> ownerRequestAccount(
     UserData userData, BuildContext context) async {
   try {
-    // Ahora puedes agregar datos adicionales a la colección en Firestore
     await FirebaseFirestore.instance
         .collection(Collection.ownerAccount)
-        .doc()
+        .doc(userData.id)
         .set({
       AccountRequestCollection.nombre: userData.nombre,
       AccountRequestCollection.apellidos: userData.apellidos,
@@ -369,7 +399,6 @@ Future<void> ownerRequestAccount(
       AccountRequestCollection.genero: userData.genero,
       AccountRequestCollection.tipo: userData.typeUser,
       AccountRequestCollection.estado: 'pendiente'
-      // Agrega otros campos de datos aquí
     });
     if (!context.mounted) return;
     Toast.show(
@@ -380,4 +409,3 @@ Future<void> ownerRequestAccount(
     Toast.show(context, '$error'.toString());
   }
 }
-

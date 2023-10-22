@@ -91,28 +91,28 @@ class _AgregarPisoScreenState extends State<AgregarPisoScreen> {
         backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text("Nombre del Piso"),
+            const Text("Nombre del Piso"),
             TextFormField(
               controller: nombreController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Ingrese el nombre del piso",
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
-            Text("Descripción del Piso"),
+            const Text("Descripción del Piso"),
             TextFormField(
               controller: descripcionController,
               maxLines: 4,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Ingrese la descripción del piso",
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
             
 

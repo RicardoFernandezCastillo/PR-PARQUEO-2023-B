@@ -1,18 +1,15 @@
 import 'package:bluehpark/models/coleccion/collection_field.dart';
 import 'package:bluehpark/models/coleccion/collections.dart';
+import 'package:bluehpark/models/user.dart';
+import 'package:bluehpark/pages/owner/form_data/request_data.dart';
+import 'package:bluehpark/utilities/toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart' show FirebaseFirestore;
-import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth, UserCredential;
+import 'package:firebase_auth/firebase_auth.dart'show FirebaseAuth, UserCredential;
 import 'package:flutter/material.dart';
-import '../../models/user.dart';
-import '../../utilities/progressbar.dart' show ProgressDialog;
-import '../../utilities/toast.dart' show Toast;
 
-class TypeUser extends StatelessWidget {
-  final UserData userData;
-  const TypeUser({
+class TypeUserRequest extends StatelessWidget {
+  const TypeUserRequest({
     Key? key,
-    required this.userData,
   }) : super(key: key);
 
   @override
@@ -29,8 +26,9 @@ class TypeUser extends StatelessWidget {
             color: Colors.black,
           ),
           iconSize: 30,
-          onPressed: () {
-            // Aquí puedes agregar la lógica para manejar la acción del botón
+          onPressed: () async {
+            await FirebaseAuth.instance.signOut();
+            if (!context.mounted) return;
             Navigator.pop(context);
           },
         ),
@@ -44,20 +42,14 @@ class TypeUser extends StatelessWidget {
                   top: 100), // Espacio de 20 puntos en la parte superior
               child: Center(
                 child: ElevatedButton(
-                  onPressed: () async {
-                    // Acción cuando se presiona el botón
-                    try {
-                      ProgressDialog.show(context, 'Registrando usuario...');
-                      userData.typeUser =
-                          'Cliente'; // Muestra el diálogo de progreso
-                      await registerUser(userData, context);
-
-                      // ignore: use_build_context_synchronously
-                      ProgressDialog.hide(context);
-                    } catch (e) {
-                      // ignore: use_build_context_synchronously
-                      Toast.show(context, e.toString());
-                    }
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const RequetFormScreen(userType: 'Cliente'),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     padding:
@@ -103,22 +95,17 @@ class TypeUser extends StatelessWidget {
               child: Center(
                 child: ElevatedButton(
                   onPressed: () async {
-                    // Acción cuando se presiona el botón
                     try {
-                      ProgressDialog.show(context, 'Registrando usuario...');
-                      userData.typeUser =
-                          'Dueño'; // Muestra el diálogo de progreso
-                      await ownerRequestAccount(userData, context);
-
-                      // ignore: use_build_context_synchronously
-                      ProgressDialog.hide(
-                          context); // Oculta el diálogo de progreso después de completar la tarea
+                        if (!context.mounted) return;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const RequetFormScreen(userType: 'Dueño'),
+                          ),
+                        );
                     } catch (e) {
-                      // ignore: use_build_context_synchronously
-                      ProgressDialog.hide(
-                          context); // Asegúrate de ocultar el diálogo de progreso en caso de error
-                      // ignore: use_build_context_synchronously
-                      Toast.show(context, e.toString());
+                      rethrow;
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -181,7 +168,10 @@ Future<void> registerUser(UserData userData, BuildContext context) async {
       String userId = userCredential.user!.uid; // Obtiene el ID del usuario
 
       // Ahora puedes agregar datos adicionales a la colección en Firestore
-      await FirebaseFirestore.instance.collection(Collection.usuarios).doc(userId).set({
+      await FirebaseFirestore.instance
+          .collection(Collection.usuarios)
+          .doc(userId)
+          .set({
         UsersCollection.nombre: userData.nombre,
         UsersCollection.apellidos: userData.apellidos,
         UsersCollection.telefono: userData.telefono,
@@ -195,33 +185,40 @@ Future<void> registerUser(UserData userData, BuildContext context) async {
       // Registro exitoso, puedes mostrar un mensaje o redirigir al usuario a otra pantalla.
     } else {
       // Handle error: usuario no creado correctamente
-      // ignore: use_build_context_synchronously  
-      Toast.show(context,'Usuario no creado correctamente');
+      // ignore: use_build_context_synchronously
+      Toast.show(context, 'Usuario no creado correctamente');
     }
   } catch (error) {
     // Handle any registration errors here
     // ignore: use_build_context_synchronously
-    Toast.show(context,'$error'.toString());
+    Toast.show(context, '$error'.toString());
   }
 }
-Future<void> ownerRequestAccount(UserData userData, BuildContext context) async {
-  try {
 
-        // Ahora puedes agregar datos adicionales a la colección en Firestore
-    await FirebaseFirestore.instance.collection(Collection.ownerAccount).doc().set({
+Future<void> ownerRequestAccount(
+    UserData userData, BuildContext context) async {
+  try {
+    // Ahora puedes agregar datos adicionales a la colección en Firestore
+    await FirebaseFirestore.instance
+        .collection(Collection.ownerAccount)
+        .doc()
+        .set({
       AccountRequestCollection.nombre: userData.nombre,
       AccountRequestCollection.apellidos: userData.apellidos,
       AccountRequestCollection.telefono: userData.telefono,
       AccountRequestCollection.correo: userData.correoElectronico,
       AccountRequestCollection.genero: userData.genero,
       AccountRequestCollection.tipo: userData.typeUser,
-      AccountRequestCollection.estado: 'pendiente'
+      AccountRequestCollection.estado: 'pendiente',
+      AccountRequestCollection.detalle: 'Esto es detalle'
       // Agrega otros campos de datos aquí
     });
-  	Toast.show(context,'Se ha realizado la Solicitud\nSe le notificara al correo');
+    if (!context.mounted) return;
+    Toast.show(
+        context, 'Se ha realizado la Solicitud\nSe le notificara al correo');
   } catch (error) {
     // Handle any registration errors here
     // ignore: use_build_context_synchronously
-    Toast.show(context,'$error'.toString());
+    Toast.show(context, '$error'.toString());
   }
 }

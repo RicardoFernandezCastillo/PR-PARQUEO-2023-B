@@ -2,7 +2,6 @@ import 'package:bluehpark/models/ticket_class.dart';
 import 'package:flutter/material.dart';
 import 'package:ticket_widget/ticket_widget.dart';
 
-
 // ignore: must_be_immutable
 class DetailTicket extends StatefulWidget {
   Ticket ticket;

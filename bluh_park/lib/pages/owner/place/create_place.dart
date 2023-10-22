@@ -1,4 +1,5 @@
-import 'package:bluehpark/Models/parking.dart';
+import 'dart:developer';
+import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -24,10 +25,10 @@ class PlazaListScreen extends StatefulWidget {
   const PlazaListScreen({super.key});
 
   @override
-  _PlazaListScreenState createState() => _PlazaListScreenState();
+  PlazaListScreenState createState() => PlazaListScreenState();
 }
 
-class _PlazaListScreenState extends State<PlazaListScreen> {
+class PlazaListScreenState extends State<PlazaListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,7 +107,7 @@ class _PlazaListScreenState extends State<PlazaListScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AgregarPlazaScreen()),
+            MaterialPageRoute(builder: (context) =>const AgregarPlazaScreen()),
           );
         },
         backgroundColor: Colors.blue,
@@ -132,10 +133,10 @@ class AgregarPlazaScreen extends StatefulWidget {
   const AgregarPlazaScreen({super.key});
 
   @override
-  _AgregarPlazaScreen createState() => _AgregarPlazaScreen();
+  AgregarPlazaScreenState createState() => AgregarPlazaScreenState();
 }
 
-class _AgregarPlazaScreen extends State<AgregarPlazaScreen> {
+class AgregarPlazaScreenState extends State<AgregarPlazaScreen> {
   String nombre = '';
   String tipoVehiculo = '';
   bool tieneCobertura = false;
@@ -294,6 +295,7 @@ class _AgregarPlazaScreen extends State<AgregarPlazaScreen> {
                 await agregarDocumentoASubcoleccion(
                     'IDParqueo', 'IDPiso', 'IDFila', datos);
                 // Crea una nueva Plaza y devuelve los datos a la pantalla anterior.
+                if (!context.mounted) return;
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
@@ -319,10 +321,10 @@ class EditarPlazaScreen extends StatefulWidget {
   const EditarPlazaScreen({super.key, required this.idPlaza});
 
   @override
-  _EditarPlazaScreenState createState() => _EditarPlazaScreenState();
+  EditarPlazaScreenState createState() => EditarPlazaScreenState();
 }
 
-class _EditarPlazaScreenState extends State<EditarPlazaScreen> {
+class EditarPlazaScreenState extends State<EditarPlazaScreen> {
   TextEditingController nombreController = TextEditingController();
   TextEditingController descripcionController = TextEditingController();
 
@@ -365,7 +367,7 @@ class _EditarPlazaScreenState extends State<EditarPlazaScreen> {
         });
       }
     } catch (e) {
-      print('Error al cargar los datos de la plaza: $e');
+      log('Error al cargar los datos de la plaza: $e');
     }
   }
 
@@ -564,7 +566,7 @@ Future<void> editarPlaza(String idParqueo, String idPiso, String idFila,
     await plazaRef.update(
         datos); // Utiliza update para modificar campos existentes o set con merge: true
   } catch (e) {
-    print('Error al editar la plaza: $e');
+    log('Error al editar la plaza: $e');
   }
 }
 
@@ -595,7 +597,7 @@ Future<List<Plaza>> getPlaces(
 
     return plazas;
   } catch (e) {
-    print('Error al obtener las plazas: $e');
+    log('Error al obtener las plazas: $e');
     return [];
   }
 }

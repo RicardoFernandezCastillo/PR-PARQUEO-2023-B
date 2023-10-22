@@ -46,7 +46,7 @@ class CreateParqueoScreen extends StatelessWidget {
 
         ),
 
-        body: ParqueoListScreen(),
+        body: const ParqueoListScreen(),
 
       ),
 
@@ -96,7 +96,7 @@ class _ParqueoListScreenState extends State<ParqueoListScreen> {
 
           if (snapshot.connectionState == ConnectionState.waiting) {
 
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
 
           }
 
@@ -330,62 +330,62 @@ class _AgregarParqueoScreen extends State<AgregarParqueoScreen> {
       ),
 
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
 
             // Input de texto para el nombre del parqueo
-            Text("1. Nombre del Parqueo"),
+            const Text("1. Nombre del Parqueo"),
             
             TextFormField(
               controller: nombreController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Ingrese el nombre del parqueo",
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
             // Input de texto para la dirección del parqueo
-            Text("2. Dirección del Parqueo"),
+            const Text("2. Dirección del Parqueo"),
             TextFormField(
               controller: direccionController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Ingrese la dirección del parqueo",
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
             // Input de texto para la latitud y longitud
-            Text("3. Coordenadas"),
+            const Text("3. Coordenadas"),
             Row(
               children: [
                 Expanded(
                   child: TextFormField(
                     controller: latitudController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Latitud",
                     ),
                   ),
                 ),
-                SizedBox(width: 10.0),
+                const SizedBox(width: 10.0),
                 Expanded(
                   child: TextFormField(
                     controller: longitudController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Longitud",
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
             // Switch para "Cuenta con cubierta"
-            Text("4. Cuenta con cubierta"),
+            const Text("4. Cuenta con cubierta"),
             Row(
               children: [
-                Text("No"),
+                const Text("No"),
                 Switch(
                   value: true,
                   onChanged: (value) {
@@ -394,24 +394,24 @@ class _AgregarParqueoScreen extends State<AgregarParqueoScreen> {
                     });
                   },
                 ),
-                Text("Sí"),
+                const Text("Sí"),
               ],
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
             // Input de texto grande para la descripción del parqueo
-            Text("5. Descripción del Parqueo"),
+            const Text("5. Descripción del Parqueo"),
             TextFormField(
               controller: descripcionController,
               maxLines: 4,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Ingrese la descripción del parqueo",
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
             // Título "Vehículos permitidos"
-            Text("6. Vehículos permitidos"),
+            const Text("6. Vehículos permitidos"),
             //Row(
             //  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             //  children: [
@@ -447,118 +447,118 @@ class _AgregarParqueoScreen extends State<AgregarParqueoScreen> {
             //    Text("Mixto"),
             //  ],
             //),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
             // Input de texto para el NIT del propietario
-            Text("7. NIT del Propietario"),
+            const Text("7. NIT del Propietario"),
             TextFormField(
               controller: nitController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: "Ingrese el NIT del propietario",
               ),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
             // Tarifas de auto y moto
-            Text("8. Tarifas"),
+            const Text("8. Tarifas"),
             Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text("Autos: hora/"),
+                      const Text("Autos: hora/"),
                       TextFormField(
                         controller: automovilHoraController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Ingrese tarifa por hora",
                         ),
                       ),
-                      Text("Bs. - día/"),
+                      const Text("Bs. - día/"),
                       TextFormField(
                         controller: automovilDiaController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Ingrese tarifa por día",
                         ),
                       ),
-                      Text("Bs."),
+                      const Text("Bs."),
                     ],
                   ),
                 ),
-                SizedBox(width: 20.0),
+                const SizedBox(width: 20.0),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text("Motos: hora/"),
+                      const Text("Motos: hora/"),
                       TextFormField(
                         controller: motoHoraController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Ingrese tarifa por hora",
                         ),
                       ),
-                      Text("Bs. - día/"),
+                      const Text("Bs. - día/"),
                       TextFormField(
                         controller: motoDiaController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Ingrese tarifa por día",
                         ),
                       ),
-                      Text("Bs."),
+                      const Text("Bs."),
                     ],
                   ),
                 ),
-                SizedBox(width: 20.0),
+                const SizedBox(width: 20.0),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text("Otros: hora/"),
+                      const Text("Otros: hora/"),
                       TextFormField(
                         controller: otroHoraController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Ingrese tarifa por hora",
                         ),
                       ),
-                      Text("Bs. - día/"),
+                      const Text("Bs. - día/"),
                       TextFormField(
                         controller: otroDiaController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Ingrese tarifa por día",
                         ),
                       ),
-                      Text("Bs."),
+                      const Text("Bs."),
                     ],
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
 
             // Input de texto para la hora de apertura y cierre
-            Text("9. Horario de Apertura y Cierre"),
+            const Text("9. Horario de Apertura y Cierre"),
             Row(
               children: [
                 Expanded(
                   child: TextFormField(
                     controller: horaAperturaController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Hora de Apertura",
                     ),
                   ),
                 ),
-                SizedBox(width: 10.0),
+                const SizedBox(width: 10.0),
                 Expanded(
                   child: TextFormField(
                     controller: horaCierreController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: "Hora de Cierre",
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () async{
                 GeoPoint ubicacion = GeoPoint(double.parse(latitudController.text), double.parse(longitudController.text));
@@ -586,11 +586,11 @@ class _AgregarParqueoScreen extends State<AgregarParqueoScreen> {
                 await agregarParqueo(data);
               },
               style: ElevatedButton.styleFrom(
-                primary: Color.fromARGB(255, 23, 131, 255), // Color de fondo azul
+                primary: const Color.fromARGB(255, 23, 131, 255), // Color de fondo azul
                 onPrimary: Colors.white, // Color del texto en blanco
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
               ),
-              child: Text("Registrar"),
+              child: const Text("Registrar"),
             ),
           ],
         ),

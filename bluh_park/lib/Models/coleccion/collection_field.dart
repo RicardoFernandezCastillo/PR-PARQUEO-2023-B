@@ -18,4 +18,5 @@ class AccountRequestCollection {
   static const String tipo = 'tipo';
   static const String parqueos = 'parqueos';
   static const String estado = 'estado';
+  static const String detalle = 'detalle';
 }

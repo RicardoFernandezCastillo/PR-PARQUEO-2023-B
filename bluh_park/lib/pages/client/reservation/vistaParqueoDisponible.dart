@@ -46,7 +46,7 @@ class ParqueoDisponibleListScreen extends StatefulWidget {
   
             if (snapshot.connectionState == ConnectionState.waiting) {
   
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
   
             }
   
@@ -241,17 +241,17 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
         backgroundColor: const Color.fromARGB(255, 5, 126, 225),
         title: Text(
           nombreParqueoController.text,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Grupo de 3 radio buttons
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Radio(
@@ -291,20 +291,20 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Horario:'),
-                SizedBox(width: 10.0),
+                const Text('Horario:'),
+                const SizedBox(width: 10.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hora Apertura:'),
+                    const Text('Hora Apertura:'),
                     Text(horaAperturaController.text),
                   ],
                 ),
-                SizedBox(width: 20.0),
+                const SizedBox(width: 20.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Hora Cierre:'),
+                    const Text('Hora Cierre:'),
                     Text(horaCierreController.text),
                   ],
                 ),
@@ -312,16 +312,16 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
             ),
 
             // Cuadro de texto medio amplio
-            SizedBox(height: 20.0),
-            Text(
+            const SizedBox(height: 20.0),
+            const Text(
               'Texto Medio Amplio:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10.0),
+            const SizedBox(height: 10.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Tarifas'),
+                const Text('Tarifas'),
                 Text(tarifaAutomovilController.text),
               ],
             ),

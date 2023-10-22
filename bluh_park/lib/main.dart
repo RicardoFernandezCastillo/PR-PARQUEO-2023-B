@@ -1,3 +1,4 @@
+import 'package:bluehpark/pages/login/login_page.dart';
 import 'package:bluehpark/pages/login/login_screen.dart';
 import 'package:bluehpark/pages/login/register.dart';
 import 'package:bluehpark/pages/login/signup_screen.dart';
@@ -35,11 +36,12 @@ class MyApp extends StatelessWidget {
         ),
         home: WelcomeScreen(),
         routes: {
-          RegisterScreen.routeName: (context) => const RegisterScreen(),
+          //RegisterScreen.routeName: (context) => RegisterScreen(),
           WelcomeScreen.routeName: (context) => WelcomeScreen(),
           SignupScreen.routeName: (context) => SignupScreen(),
           LoginScreen.routeName: (context) => LoginScreen(),
-          
+          LoginPage.routeName: (context) => LoginPage(),
+
           CreatePlaceScreen.routeName: (context) => const CreatePlaceScreen(),
           SelectParkingScreen.routeName:(context) => const SelectParkingScreen(),
           SelectSpaceScreen.routeName:(context) => const SelectSpaceScreen(),

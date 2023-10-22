@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
-class HomeOwner extends StatelessWidget {
+class HomeOwner extends StatefulWidget {
   const HomeOwner({super.key});
 
+  @override
+  State<HomeOwner> createState() => _HomeOwnerState();
+}
+
+class _HomeOwnerState extends State<HomeOwner> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,7 +15,7 @@ class HomeOwner extends StatelessWidget {
         child: Stack(
           children: <Widget>[
             Container(
-              height: 1200,
+              height: 1250,
             ),
             ClipRRect(
               borderRadius: const BorderRadius.only(
@@ -185,20 +190,14 @@ class HomeOwner extends StatelessWidget {
                 elevation: 4,
                 margin: const EdgeInsets.symmetric(horizontal: 40),
                 child: Container(
-                  height: 350,
+                  height: 550,
                   padding: const EdgeInsets.all(16),
                   child: const Column(
                     children: [
                       ListTile(
                         title: Text("Ubicación Mis Parqueos"),
                       ),
-                      SizedBox(
-                        height: 200,
-                        child: Text(
-                          "Mapa",
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+                      //SizedBox(child: MapOwner()),
                     ],
                   ),
                 ),

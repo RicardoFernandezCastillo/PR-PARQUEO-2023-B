@@ -1,7 +1,6 @@
 import 'package:bluehpark/models/seccion_class.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
 Future<void> createDocumentoASubcoleccion(
     String idParqueo, String idPiso, Map<String, dynamic> datos) async {
   // Obtén una referencia a la colección principal, en este caso, 'parqueos'
