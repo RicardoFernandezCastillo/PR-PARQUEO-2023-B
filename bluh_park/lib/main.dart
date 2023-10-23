@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_create_account/LocationPicker/locationPicker.dart';
 import 'package:flutter_create_account/parking/registroParqueo.dart';
 import 'package:flutter_create_account/register.dart';
 import 'firebase_options.dart';
@@ -22,7 +23,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/register', // Ruta inicial a 'register.dart'
       routes: {
-        '/register': (context) => const RegistroParqueoScreen(), // Define la ruta '/register'
+        '/register': (context) => const RegistroParqueoScreen(), 
+        '/locationPicker':(context) => const LocationPicker()// Define la ruta '/register'
       },
     );
   }

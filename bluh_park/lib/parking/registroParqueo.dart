@@ -4,6 +4,8 @@ import 'dart:io' show File;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_create_account/models/validation/validator.dart';
 import 'package:flutter_create_account/utilities/progressbar.dart';
 import 'package:flutter_create_account/utilities/toast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -98,6 +100,7 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
             selectedTime[1] = pickedTime;
           });
         } else {
+          // ignore: use_build_context_synchronously
           Toast.show(context, 'Horario no disponible');
         }
       }
@@ -145,7 +148,7 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
-
+    final formKey = GlobalKey<FormState>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 65, 100, 140),
@@ -176,7 +179,7 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
               padding: const EdgeInsets.all(15),
               alignment: Alignment.center,
               child: Card(
-                color: Color.fromARGB(255, 255, 255, 255),
+                color: const Color.fromARGB(255, 255, 255, 255),
                 elevation: 20,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
@@ -194,8 +197,14 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      TextField(
+                      TextFormField(
                         controller: nombreController,
+                        // ignore: body_might_complete_normally_nullable
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'No pueden ser vacio estos campos';
+                          }
+                        },
                         decoration: InputDecoration(
                           hintText: 'Ingrese el nombre del Parqueo',
                           hintStyle: const TextStyle(
@@ -221,7 +230,9 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 22, vertical: 20),
+                          horizontal: 22,
+                          vertical: 20,
+                        ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
@@ -282,7 +293,13 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      TextField(
+                      TextFormField(
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Campo Obligatorio';
+                          }
+                          return null;
+                        },
                         controller: direccionController,
                         decoration: InputDecoration(
                           hintText: 'Ingrese la direccion del Parqueo',
@@ -298,59 +315,28 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      const Text(
-                        "4. Coordenadas",
-                        style: TextStyle(
-                          fontFamily: 'Urbanist',
-                          fontSize: 20,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
                       Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextField(
-                              controller: latitudController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10.0,
-                                  horizontal: 10.0,
-                                ), // Ajusta estos valores según tus necesidades
-                                hintText: 'Latitud',
-                                hintStyle: const TextStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 18,
-                                ),
-                                filled: true,
-                                fillColor: const Color(0xFFE8ECF4),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                              ),
+                        children: [
+                          const Text(
+                            "4. Ubicacion",
+                            style: TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 20,
                             ),
                           ),
-                          const SizedBox(width: 10.0),
-                          Expanded(
-                            child: TextField(
-                              controller: longitudController,
-                              decoration: InputDecoration(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 10.0,
-                                  horizontal: 10.0,
-                                ), // Ajusta estos valores según tus necesidades
-                                hintText: 'Longitud',
-                                hintStyle: const TextStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: 18,
-                                ),
-                                filled: true,
-                                fillColor: const Color(0xFFE8ECF4),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                              ),
+                          IconButton(
+                            onPressed: () => {
+                              Navigator.pushNamed(
+                                context,
+                                '/locationPicker',
+                              )
+                            },
+                            icon: const Icon(
+                              Icons.location_on,
+                              size: 30,
                             ),
-                          ),
+                            color: Colors.blue[500],
+                          )
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -384,7 +370,13 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      TextField(
+                      TextFormField(
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'campo obligatorio';
+                          }
+                          return null;
+                        },
                         maxLines: 4,
                         controller: descripcionController,
                         decoration: InputDecoration(
@@ -457,7 +449,7 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      TextField(
+                      TextFormField(
                         controller: nitController,
                         decoration: InputDecoration(
                           hintText: 'Ingrese el NIT del propietario',
@@ -495,7 +487,7 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: TextField(
+                            child: TextFormField(
                               controller: automovilHoraController,
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
@@ -517,7 +509,7 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: TextField(
+                            child: TextFormField(
                               controller: automovilDiaController,
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
@@ -554,7 +546,7 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: TextField(
+                            child: TextFormField(
                               controller: motoHoraController,
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
@@ -613,7 +605,13 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: TextField(
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Campo requerido';
+                                }
+                                return null;
+                              },
                               controller: otroHoraController,
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
@@ -635,7 +633,13 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: TextField(
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Campo requerido';
+                                }
+                                return null;
+                              },
                               controller: otroDiaController,
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
@@ -763,6 +767,7 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       const SizedBox(height: 40),
                       Center(
                         child: ElevatedButton(
+                          onHover: (value) => {if (value) {}},
                           style: ButtonStyle(
                             padding: MaterialStatePropertyAll(
                               EdgeInsets.only(
@@ -849,11 +854,15 @@ class _RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                   ),
                 ),
               ),
-            )
-          ],
+            ),
+          ], //Aca  borrar
         ),
       ),
     );
+  }
+
+  String? llamada(String val) {
+    return '';
   }
 
   Future<void> agregarParqueo({required Map<String, dynamic> datos}) async {
