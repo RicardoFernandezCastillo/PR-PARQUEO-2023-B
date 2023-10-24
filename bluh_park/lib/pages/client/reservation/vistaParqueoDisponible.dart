@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
@@ -5,24 +7,17 @@ import 'package:flutter/material.dart';
 import '../../../Models/Parqueo.dart';
 
 
-
-
 class ParqueoDisponibleListScreen extends StatefulWidget {
 
     const ParqueoDisponibleListScreen({super.key});
     static const routeName = '/vista-parqueoDisponible';
-  
-   
-  
     @override
   
-    _ParqueoDisponibleListScreenState createState() => _ParqueoDisponibleListScreenState();
+    ParqueoDisponibleListScreenState createState() => ParqueoDisponibleListScreenState();
   
   }
   
-   
-  
-  class _ParqueoDisponibleListScreenState extends State<ParqueoDisponibleListScreen> {
+  class ParqueoDisponibleListScreenState extends State<ParqueoDisponibleListScreen> {
   
     @override
   
@@ -143,44 +138,25 @@ class ParqueoDisponibleListScreen extends StatefulWidget {
     }
   
   }
-
-
   Stream<QuerySnapshot> obtenerParqueosStream() {
 
     try {
   
       CollectionReference parqueosCollection = FirebaseFirestore.instance
-  
           .collection('parqueo');
-  
-  
-          
-  
       return parqueosCollection
   
           .snapshots(); // Devuelve un Stream que escucha cambios en la colección.
   
     } catch (e) {
   
-      print('Error al obtener el Stream de plazas: $e');
+      log('Error al obtener el Stream de plazas: $e');
   
-      throw e;
+      rethrow;
   
     }
   
   }
-
-
-
-
-
-
-
-
-
-
-
-
 
 class MostrarDatosParqueoScreen extends StatefulWidget {
   

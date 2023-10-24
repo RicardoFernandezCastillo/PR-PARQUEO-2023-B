@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
@@ -5,9 +7,6 @@ import 'package:flutter/material.dart';
 import '../floor/vistaPiso.dart';
 
 import '../../../Models/Parqueo.dart';
-
- 
-
 class Plaza {
 
   final String nombre;
@@ -20,14 +19,9 @@ class Plaza {
 
 }
 
- 
-
 class CreateParqueoScreen extends StatelessWidget {
 
   static const routeName = '/vista-parqueo';
-
-
-
   const CreateParqueoScreen({super.key});
 
   @override
@@ -586,8 +580,7 @@ class _AgregarParqueoScreen extends State<AgregarParqueoScreen> {
                 await agregarParqueo(data);
               },
               style: ElevatedButton.styleFrom(
-                primary: const Color.fromARGB(255, 23, 131, 255), // Color de fondo azul
-                onPrimary: Colors.white, // Color del texto en blanco
+                foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 23, 131, 255), // Color del texto en blanco
                 padding: const EdgeInsets.all(16.0),
               ),
               child: const Text("Registrar"),
@@ -607,21 +600,19 @@ class EditarParqueoScreen extends StatefulWidget {
 
   final String idParqueo; // Recibe el ID de la plaza
 
- 
-
-  EditarParqueoScreen({required this.idParqueo});
+  const EditarParqueoScreen({super.key, required this.idParqueo});
 
  
 
   @override
 
-  _EditarParqueoScreenState createState() => _EditarParqueoScreenState();
+  EditarParqueoScreenState createState() => EditarParqueoScreenState();
 
 }
 
  
 
-class _EditarParqueoScreenState extends State<EditarParqueoScreen> {
+class EditarParqueoScreenState extends State<EditarParqueoScreen> {
 
   TextEditingController nombreController = TextEditingController();
 
@@ -697,7 +688,7 @@ class _EditarParqueoScreenState extends State<EditarParqueoScreen> {
 
     } catch (e) {
 
-      print('Error al cargar los datos de la plaza: $e');
+      log('Error al cargar los datos de la plaza: $e');
 
     }
 
@@ -961,7 +952,7 @@ class _EditarParqueoScreenState extends State<EditarParqueoScreen> {
 
               },
 
-              style: ElevatedButton.styleFrom(primary: Colors.blue),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
 
               child: const Text('Guardar Cambios'),
 

@@ -34,10 +34,10 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorSchemeSeed: const Color.fromARGB(255, 2, 51, 135)
         ),
-        home: WelcomeScreen(),
+        home: const WelcomeScreen(),
         routes: {
           //RegisterScreen.routeName: (context) => RegisterScreen(),
-          WelcomeScreen.routeName: (context) => WelcomeScreen(),
+          WelcomeScreen.routeName: (context) => const WelcomeScreen(),
           SignupScreen.routeName: (context) => SignupScreen(),
           LoginScreen.routeName: (context) => LoginScreen(),
           LoginPage.routeName: (context) => LoginPage(),
@@ -47,7 +47,6 @@ class MyApp extends StatelessWidget {
           SelectSpaceScreen.routeName:(context) => const SelectSpaceScreen(),
 
           RegistroParqueoScreen.routeName: (context) => const RegistroParqueoScreen(),
-
 
           SearchPlaceScreen.routeName:(context) => const SearchPlaceScreen(),
         },
