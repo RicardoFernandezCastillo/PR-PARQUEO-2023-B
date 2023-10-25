@@ -18,7 +18,7 @@ class HomeClient extends StatelessWidget {
                   bottomRight: Radius.circular(30),
                   bottomLeft: Radius.circular(30)),
               child: Container(
-                color: const Color(0xff2e61e6),
+                color: Colors.blue,
                 height: 250,
                 child: Center(
                     child: Column(
@@ -67,7 +67,7 @@ class HomeClient extends StatelessWidget {
                               // Agrega la lógica para el botón 'Mis parqueos' aquí
                             },
                             iconSize: 50,
-                            color: const Color(0xff2e61e6),
+                            color: Colors.blue,
                           ),
                           const Text(
                             'Nueva Reserva',
@@ -84,7 +84,7 @@ class HomeClient extends StatelessWidget {
                             // Agrega la lógica para el botón 'Reservas solicitadas' aquí
                           },
                           iconSize: 50,
-                          color: const Color(0xff2e61e6),
+                          color: Colors.blue,
                         ),
                         const Text(
                           'Reservas Activas',
@@ -113,18 +113,19 @@ class HomeClient extends StatelessWidget {
                   elevation: 4,
                   margin: const EdgeInsets.symmetric(horizontal: 40),
                   child: Container(
-                    height: 100,
+                    height: 120,
                     padding: const EdgeInsets.all(16),
                     child: const Column(
                       children: [
-                        ListTile(
-                          title: Text("Ubicación Mis Parqueos"),
+                        Icon(
+                          Icons.map_outlined,
+                          size: 40,
+                          color: Colors.green,
                         ),
-                        SizedBox(
-                          height: 200,
-                          child: Text(
-                            "Mapa",
-                            textAlign: TextAlign.center,
+                        ListTile(
+                          title: Text(
+                            "Buscar Parqueos",
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],

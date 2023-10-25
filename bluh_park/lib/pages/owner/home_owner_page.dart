@@ -198,11 +198,16 @@ class _HomeOwnerState extends State<HomeOwner> {
                   elevation: 4,
                   margin: const EdgeInsets.symmetric(horizontal: 40),
                   child: Container(
-                    height: 100,
+                    height: 120,
                     padding: const EdgeInsets.all(16),
                     child: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Icon(
+                          Icons.map_outlined,
+                          size: 40,
+                          color: Colors.green,
+                        ),
                         ListTile(
                           title: Text(
                             "Ubicación Mis Parqueos",

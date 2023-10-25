@@ -1,4 +1,5 @@
 import 'package:bluh_park/pages/owner/home_owner_page.dart';
+import 'package:bluh_park/pages/profile.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const MenuOwner());
@@ -17,7 +18,7 @@ class _MenuOwnerState extends State<MenuOwner> {
     const HomeOwner(),
     const Text('Reportes'),
     const Text('Notificaciones'),
-    const Text('Perfil'),
+    const ProfilePage(),
   ];
 
   @override
