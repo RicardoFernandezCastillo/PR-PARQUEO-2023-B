@@ -1,14 +1,17 @@
 import 'package:bluehpark/models/seccion_class.dart';
+import 'package:bluehpark/pages/owner/place/create_place.dart';
+import 'package:bluehpark/pages/owner/seccion/seccion_create.dart';
 import 'package:bluehpark/pages/owner/seccion/seccion_edit.dart';
 import 'package:bluehpark/services/fb_service_secccion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(const SeccionList());
+//void main() => runApp(const SeccionList());
 
 // ignore: must_be_immutable
 class SeccionList extends StatefulWidget {
-  const SeccionList({super.key});
+  final DocumentReference pisoRef;
+  const SeccionList({super.key, required this.pisoRef});
   @override
   State<SeccionList> createState() => _SeccionListState();
 }
@@ -54,8 +57,14 @@ class _SeccionListState extends State<SeccionList> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // Agrega aquí la lógica para la acción del botón "Nuevo"
-                        Navigator.pushNamed(context, '/seccion/create');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SeccionCreate(
+                              pisoRef: widget.pisoRef,
+                            ),
+                          ),
+                        );
                       },
                       child: const Text('Nuevo'),
                     ),
@@ -63,7 +72,7 @@ class _SeccionListState extends State<SeccionList> {
                 ),
                 Expanded(
                   child: StreamBuilder(
-                    stream: getSeccionsStream("ID-PARQUEO-3", "ID-PISO-1"),
+                    stream: getSeccionsStream(widget.pisoRef),
                     builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -75,9 +84,7 @@ class _SeccionListState extends State<SeccionList> {
                           snapshot.data!.docs.map((DocumentSnapshot document) {
                         Map<String, dynamic> data =
                             document.data() as Map<String, dynamic>;
-                        String idDocumento = document.id;
-                        return Seccion(
-                            idDocumento, data['nombre'], data['descripcion']);
+                        return Seccion(document.reference, data['nombre'], data['descripcion']);
                       }).toList();
                       return ListView.builder(
                         itemCount: seccions.length,
@@ -85,9 +92,18 @@ class _SeccionListState extends State<SeccionList> {
                           final seccion = seccions[index];
                           return InkWell(
                             onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PlazaListScreen(
+                                      seccionRef: seccion.idSeccion,
+                                    ),
+                                  ),
+                                );
                               // Aquí puedes definir la acción que se realizará al hacer clic en el elemento.
                               // Por ejemplo, puedes abrir una pantalla de detalles de la plaza.
                               //abrirDetallesPlaza(plaza);
+                              //PlazaListScreen
                             },
                             child: ListTile(
                               title: Text(seccion.name),
@@ -103,7 +119,7 @@ class _SeccionListState extends State<SeccionList> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => SeccionEdit(
-                                        idSeccion: seccion.idSeccion,
+                                        seccionRef: seccion.idSeccion,
                                       ),
                                     ),
                                   );

@@ -3,7 +3,6 @@ import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-
 class CreatePlaceScreen extends StatelessWidget {
   static const routeName = '/create-place-srceen';
 
@@ -15,14 +14,15 @@ class CreatePlaceScreen extends StatelessWidget {
         appBar: AppBar(
             title: const Text('Lista de Plazas'),
             backgroundColor: const Color.fromARGB(255, 5, 126, 225)),
-        body: const PlazaListScreen(),
+        //body: const PlazaListScreen(),
       ),
     );
   }
 }
 
 class PlazaListScreen extends StatefulWidget {
-  const PlazaListScreen({super.key});
+  final DocumentReference seccionRef;
+  const PlazaListScreen({super.key, required this.seccionRef});
 
   @override
   PlazaListScreenState createState() => PlazaListScreenState();
@@ -33,7 +33,7 @@ class PlazaListScreenState extends State<PlazaListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
-        stream: obtenerPlazasStream('ID-PARQUEO-3', 'ID-PISO-1', 'ID-FILA-1'),
+        stream: obtenerPlazasStream(widget.seccionRef),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -107,7 +107,7 @@ class PlazaListScreenState extends State<PlazaListScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) =>const AgregarPlazaScreen()),
+            MaterialPageRoute(builder: (context) => AgregarPlazaScreen(seccionRef: widget.seccionRef)),
           );
         },
         backgroundColor: Colors.blue,
@@ -130,7 +130,8 @@ class PlazaListScreenState extends State<PlazaListScreen> {
 }
 
 class AgregarPlazaScreen extends StatefulWidget {
-  const AgregarPlazaScreen({super.key});
+  final DocumentReference seccionRef;
+  const AgregarPlazaScreen({super.key, required this.seccionRef});
 
   @override
   AgregarPlazaScreenState createState() => AgregarPlazaScreenState();
@@ -292,8 +293,7 @@ class AgregarPlazaScreenState extends State<AgregarPlazaScreen> {
                   'estado': estado, // Estado
                 };
                 // Llama a la función para agregar el documento a la subcolección
-                await agregarDocumentoASubcoleccion(
-                    'IDParqueo', 'IDPiso', 'IDFila', datos);
+                await agregarDocumentoASubcoleccion(widget.seccionRef,datos);
                 // Crea una nueva Plaza y devuelve los datos a la pantalla anterior.
                 if (!context.mounted) return;
                 Navigator.pop(context);
@@ -510,11 +510,8 @@ class EditarPlazaScreenState extends State<EditarPlazaScreen> {
                   'estado': estado,
                 };
                 await editarPlaza(
-                  'ID-PARQUEO-3',
-                  'ID-PISO-1',
-                  'ID-FILA-1',
                   widget.idPlaza,
-                  datos,
+                  datos
                 );
                 Navigator.pop(context);
               },
@@ -534,29 +531,28 @@ class EditarPlazaScreenState extends State<EditarPlazaScreen> {
   }
 }
 
-Future<void> agregarDocumentoASubcoleccion(String idParqueo, String idPiso,
-    String idFila, Map<String, dynamic> datos) async {
-  // Obtén una referencia a la colección principal, en este caso, 'parqueos'
-  CollectionReference parqueos =
-      FirebaseFirestore.instance.collection('parqueo');
-  // Obtén una referencia al documento del parqueo
-  DocumentReference parqueoDocRef = parqueos.doc("ID-PARQUEO-3");
-  // Obtén una referencia a la subcolección 'pisos' dentro del documento del parqueo
-  CollectionReference pisos = parqueoDocRef.collection('pisos');
-  // Obtén una referencia al documento del piso
-  DocumentReference pisoDocRef = pisos.doc('ID-PISO-1');
-  // Obtén una referencia a la subcolección 'filas' dentro del documento del piso
-  CollectionReference filas = pisoDocRef.collection('filas');
-  // Obtén una referencia al documento de la fila
-  DocumentReference filaDocRef = filas.doc('ID-FILA-1');
+Future<void> agregarDocumentoASubcoleccion(DocumentReference seccionRef, Map<String, dynamic> datos) async {
+  // // Obtén una referencia a la colección principal, en este caso, 'parqueos'
+  // CollectionReference parqueos =
+  //     FirebaseFirestore.instance.collection('parqueo');
+  // // Obtén una referencia al documento del parqueo
+  // DocumentReference parqueoDocRef = parqueos.doc("ID-PARQUEO-3");
+  // // Obtén una referencia a la subcolección 'pisos' dentro del documento del parqueo
+  // CollectionReference pisos = parqueoDocRef.collection('pisos');
+  // // Obtén una referencia al documento del piso
+  // DocumentReference pisoDocRef = pisos.doc('ID-PISO-1');
+  // // Obtén una referencia a la subcolección 'filas' dentro del documento del piso
+  // CollectionReference filas = pisoDocRef.collection('filas');
+  // // Obtén una referencia al documento de la fila
+  // DocumentReference filaDocRef = filas.doc('ID-FILA-1');
   // Obtén una referencia a la subcolección 'plazas' dentro del documento de la fila
-  CollectionReference plazasCollection = filaDocRef.collection('plazas');
+  CollectionReference plazasCollection = seccionRef.collection('plazas');
   //datos.addAll({'idParqueo': parqueoDocRef,'idPiso': pisoDocRef,'idFila': filaDocRef});
   // Usa set para agregar el documento con los datos proporcionados
   await plazasCollection.doc().set(datos);
 }
 
-Future<void> editarPlaza(String idParqueo, String idPiso, String idFila,
+Future<void> editarPlaza(
     DocumentReference idPlaza, Map<String, dynamic> datos) async {
   try {
     // Obtén una referencia al documento de la plaza que deseas editar
@@ -602,29 +598,23 @@ Future<List<Plaza>> getPlaces(
   }
 }
 
-Stream<QuerySnapshot> obtenerPlazasStream(
-    String idParqueo, String idPiso, String idFila) {
+Stream<QuerySnapshot> obtenerPlazasStream(DocumentReference seccionRef) {
   try {
-    DocumentSnapshot<Map<String, dynamic>> plazaDoc = FirebaseFirestore.instance
-        .collection('parqueo')
-        .doc('ID-PARQUEO-3') as DocumentSnapshot<Map<String, dynamic>>;
-    if (plazaDoc.exists) {
-      Map<String, dynamic> data = plazaDoc.data() as Map<String, dynamic>;
-      String nombre = data['nombre'];
-    }
+    // DocumentSnapshot<Map<String, dynamic>> plazaDoc = FirebaseFirestore.instance
+    //     .collection('parqueo')
+    //     .doc('ID-PARQUEO-3') as DocumentSnapshot<Map<String, dynamic>>;
+    // DocumentSnapshot<Map<String, dynamic>> plazaDoc =
+    //     seccionRef as DocumentSnapshot<Map<String, dynamic>>;
+    // if (plazaDoc.exists) {
+    //   Map<String, dynamic> data = plazaDoc.data() as Map<String, dynamic>;
+    //   String nombre = data['nombre'];
+    // }
 
-    CollectionReference plazasCollection = FirebaseFirestore.instance
-        .collection('parqueo')
-        .doc(idParqueo)
-        .collection('pisos')
-        .doc(idPiso)
-        .collection('filas')
-        .doc(idFila)
-        .collection('plazas');
+    CollectionReference plazasCollection = seccionRef.collection('plazas');
     return plazasCollection
         .snapshots(); // Devuelve un Stream que escucha cambios en la colección.
   } catch (e) {
-    print('Error al obtener el Stream de plazas: $e');
-    throw e;
+    log('Error al obtener el Stream de plazas: $e');
+    rethrow;
   }
 }

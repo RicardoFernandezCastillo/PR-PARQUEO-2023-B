@@ -4,8 +4,7 @@ import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:bluehpark/pages/client/reservation/search_parking_spaces.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-
+import 'package:intl/intl.dart';
 
 
 
@@ -187,28 +186,25 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
   TextEditingController nombreParqueoController = TextEditingController();
   TextEditingController horaAperturaController = TextEditingController();
   TextEditingController horaCierreController = TextEditingController();
-  TextEditingController tarifaAutomovilController = TextEditingController();
-  TextEditingController tarifaMotoController = TextEditingController();
-  TextEditingController tarifaOtrosController = TextEditingController();
+  TextEditingController tarifaAutomovilControllerHora = TextEditingController();
+  TextEditingController tarifaAutomovilControllerdia = TextEditingController();
+  TextEditingController tarifaMotoControllerHora = TextEditingController();
+  TextEditingController tarifaMotoControllerDia = TextEditingController();
+  TextEditingController tarifaOtrosControllerHora = TextEditingController();
+  TextEditingController tarifaOtrosControllerDia = TextEditingController();
 
   Map<String, bool>? vehiculosPermitidosMap;
   Map<String, dynamic>? tarifaAutomovilMap;
   Map<String, dynamic>? tarifaMotoMap;
   Map<String, dynamic>? tarifaOtrosMap;
-
-
+  bool radioValue = false;
   Timestamp? timeHoraApertura;
   Timestamp? timeHoraCierre;
 
-  DateTime? auxiHoraApertura;
-  DateTime? auxiHoraCierre;
-
-  String? stringHoraApertura;
-  String? stringHoraCierre;
+  List<DateTime?> selectedDate = [null, null];
 
   bool? tieneCobertura;
   String? coberturaTexto;
-  
 
   @override
   void initState() {
@@ -234,39 +230,32 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
           timeHoraApertura = data['horaApertura'];
           timeHoraCierre = data['horaCierre'];
 
-          auxiHoraApertura = timeHoraApertura?.toDate();
-          auxiHoraCierre = timeHoraCierre?.toDate();
-
-          stringHoraApertura = '${auxiHoraApertura?.hour}:${auxiHoraCierre?.minute}';
-          stringHoraCierre = '${auxiHoraCierre?.hour}:${auxiHoraCierre?.minute}';
-
-         
-          tarifaAutomovilMap = data['tarifaAutomovil'] as Map<String, dynamic>?;
-          if (tarifaAutomovilMap != null) {
-            tarifaAutomovilController.text =
-                'Automóviles: Hora/${tarifaAutomovilMap!['Hora'] ?? '-'}bs Día/${tarifaAutomovilMap!['Dia'] ?? '-'}bs';
-          }
-
-          tarifaMotoMap = data['tarifaMoto'] as Map<String, dynamic>?;
-          if (tarifaMotoMap != null) {
-            tarifaMotoController.text =
-                'Motos: Hora/${tarifaMotoMap!['Hora'] ?? '-'}bs Día/${tarifaMotoMap!['Dia'] ?? '-'}bs';
-          }
-
-          tarifaOtrosMap = data['tarifaOtro'] as Map<String, dynamic>?;
-          if (tarifaOtrosMap != null) {
-            tarifaOtrosController.text =
-                'Otros: Hora/${tarifaOtrosMap!['Hora'] ?? '-'}bs Día/${tarifaOtrosMap!['Dia'] ?? '-'}bs';
-          }
+          selectedDate[0] = timeHoraApertura?.toDate();
+          selectedDate[1] = timeHoraCierre?.toDate();
 
           tieneCobertura = data['tieneCobertura'];
 
-          if(tieneCobertura == true)
-          {
+          tarifaAutomovilControllerHora.text =
+              "Hora " + data['tarifaAutomovil']['Hora'].toString() + ' Bs';
+
+          tarifaAutomovilControllerdia.text =
+              "Dia " + data['tarifaAutomovil']['Dia'].toString() + ' Bs';
+
+          tarifaMotoControllerHora.text =
+              "Hora " + data['tarifaMoto']['Hora'].toString() + ' Bs';
+
+          tarifaMotoControllerDia.text =
+              "Dia " + data['tarifaMoto']['Dia'].toString() + ' Bs';
+
+          tarifaOtrosControllerHora.text =
+              "Hora " + data['tarifaOtro']['Hora'].toString() + ' Bs';
+
+          tarifaOtrosControllerDia.text =
+              "Dia " + data['tarifaOtro']['Dia'].toString() + ' Bs';
+
+          if (tieneCobertura == true) {
             coberturaTexto = "Cuenta con cobertura";
-          }
-          else
-          {
+          } else {
             coberturaTexto = "No cuenta con cobertura";
           }
         });
@@ -278,6 +267,7 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 5, 126, 225),
@@ -288,138 +278,450 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Grupo de 3 radio buttons
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Radio(
-                  value: 'Autos',
-                  groupValue: null,
-                  onChanged: null,
-                ),
-                Text('Autos'),
-                Radio(
-                  value: 'Motos',
-                  groupValue: null,
-                  onChanged: null,
-                ),
-                Text('Motos'),
-                Radio(
-                  value: 'Mixto',
-                  groupValue: null,
-                  onChanged: null,
-                ),
-                Text('Mixto'),
-              ],
-            ),
-
-            // Fila de 5 estrellas
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                5,
-                (index) => Icon(
-                  index < 5 ? Icons.star : Icons.star_border,
-                  color: Colors.yellow,
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/img_parqueo.jpg',
+                    width: size.width * 0.7,
+                  ),
                 ),
               ),
-            ),
-
-            // Fila de Horario
-            const SizedBox(width: 20.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Horario:'),
-                const SizedBox(width: 10.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 50),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: const Color.fromARGB(255, 158, 195, 213),
+                ),
+                child: Column(
                   children: [
-                    const Text('Hora Apertura:'),
-                    Text(stringHoraApertura.toString()),
+                    TextField(
+                      controller: nombreParqueoController,
+                      readOnly: true,
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Urbanist',
+                      ),
+                      textAlign: TextAlign.center,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                        focusedBorder: InputBorder.none,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    Container(
+                      padding: const EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(220, 217, 217, 217),
+                      ),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: Text(
+                              'Vehiculos Permitidos',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              IgnorePointer(
+                                ignoring:
+                                    true, // Esto hace que los Checkbox sean de solo lectura
+                                child: Radio(
+                                  groupValue: 'permitidos',
+                                  value: true,
+                                  onChanged: null,
+                                  activeColor: Colors
+                                      .blueAccent, // Pasar null a onChanged deshabilita la interacción
+                                ),
+                              ),
+                              Text('Motos'),
+                              IgnorePointer(
+                                ignoring: true,
+                                child: Radio(
+                                  groupValue: 'permitidos',
+                                  value: false,
+                                  onChanged: null,
+                                ),
+                              ),
+                              Text('Automoviles'),
+                              IgnorePointer(
+                                ignoring: false,
+                                child: Radio(
+                                  groupValue: 'permitidos',
+                                  value: false,
+                                  onChanged: null,
+                                ),
+                              ),
+                              Text(
+                                'Otros',
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(220, 217, 217, 217),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Text(
+                              'Calificacion',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: List.generate(
+                                5,
+                                (index) => Icon(
+                                  index < 5 ? Icons.star : Icons.star_border,
+                                  color: Colors.yellow[600],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(220, 217, 217, 217),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Cobertura',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              IgnorePointer(
+                                ignoring: true,
+                                child: Row(
+                                  children: <Widget>[
+                                    Radio<bool>(
+                                      value: true,
+                                      groupValue: radioValue,
+                                      onChanged:
+                                          null, // Establece onChanged a null para deshabilitar la interacción
+                                    ),
+                                    const Text('Sí'),
+                                  ],
+                                ),
+                              ),
+                              IgnorePointer(
+                                ignoring: true,
+                                child: Row(
+                                  children: <Widget>[
+                                    Radio<bool>(
+                                      value: false,
+                                      groupValue: radioValue,
+                                      onChanged: null,
+                                      // Establece onChanged a null para deshabilitar la interacción
+                                    ),
+                                    const Text('No'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(220, 217, 217, 217),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Horarios',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: InkWell(
+                                  child: Column(
+                                    children: [
+                                      const Text(
+                                        'Horario Apertura',
+                                        style: TextStyle(
+                                          fontFamily: 'Urbanist',
+                                          color: Colors.blueAccent,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons
+                                              .calendar_today), // Ícono de calendario
+                                          const SizedBox(
+                                              width:
+                                                  8), // Espacio entre el ícono y el texto
+                                          Text(
+                                            selectedDate[0] != null
+                                                ? DateFormat('dd/MM/yyyy HH:mm')
+                                                    .format(selectedDate[0]!)
+                                                : '',
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: InkWell(
+                                  child: Column(
+                                    children: [
+                                      const Text(
+                                        'Horario Cierre',
+                                        style: TextStyle(
+                                          fontFamily: 'Urbanist',
+                                          color: Colors.blueAccent,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons
+                                              .calendar_today), // Ícono de calendario
+                                          const SizedBox(
+                                              width:
+                                                  8), // Espacio entre el ícono y el texto
+                                          Text(
+                                            selectedDate[1] != null
+                                                ? DateFormat('dd/MM/yyyy HH:mm')
+                                                    .format(selectedDate[0]!)
+                                                : '',
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color.fromARGB(220, 217, 217, 217),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "9. Tarifas",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 20, left: 10),
+                            child: Text(
+                              'Autos',
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: tarifaAutomovilControllerHora,
+                                  readOnly: true,
+                                  decoration: const InputDecoration(
+                                    // Ajusta estos valores según tus necesidades
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  controller: tarifaAutomovilControllerdia,
+                                  readOnly: true,
+                                  decoration: const InputDecoration(
+                                    // Ajusta estos valores según tus necesidades
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 20, left: 10),
+                            child: Text(
+                              'Motos',
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: tarifaMotoControllerHora,
+                                  readOnly: true,
+                                  decoration: const InputDecoration(
+                                    // Ajusta estos valores según tus necesidades
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  controller: tarifaMotoControllerDia,
+                                  readOnly: true,
+                                  decoration: const InputDecoration(
+                                    // Ajusta estos valores según tus necesidades
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 20, left: 10),
+                            child: Text(
+                              'Otros',
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: tarifaOtrosControllerHora,
+                                  readOnly: true,
+                                  decoration: const InputDecoration(
+                                    // Ajusta estos valores según tus necesidades
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  controller: tarifaOtrosControllerDia,
+                                  readOnly: true,
+                                  decoration: const InputDecoration(
+                                    // Ajusta estos valores según tus necesidades
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-                const SizedBox(width: 20.0),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Hora Cierre:'),
-                    Text(stringHoraCierre.toString()),
-                  ],
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      30.0,
+                    ), // Ajusta el radio para hacerlo semi redondeado
+                  ), // Cambia el color de fondo del botón
                 ),
-              ],
-            ),
-
-            // Cuadro de texto medio amplio
-            const SizedBox(height: 20.0),
-            const Text(
-              'TARIFAS:',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                
-                Text(tarifaAutomovilController.text),
-                Text(tarifaMotoController.text),
-                Text(tarifaOtrosController.text),
-              ],
-            ),
-
-            const SizedBox(height: 20.0),
-
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(coberturaTexto.toString(), 
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold, // Esto establece el estilo en negrita
-                  fontSize: 16.0, // Puedes ajustar el tamaño de fuente según tus necesidades
-                  // Otros atributos de estilo, como color, fuente personalizada, etc., se pueden configurar aquí
-                ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40.0),
-
-            ElevatedButton(
-              onPressed: () async{
+                onPressed: () {
                     Navigator.push(
-  
                       context,
-  
                       MaterialPageRoute(
-  
                       builder: (context) => ParkingSpaces(dataSearch:widget.dataSearch),
-  
                       ),
   
                     );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                },
+                child: const Text('Ingresar'),
               ),
-              child: const Text('Hacer Reservación'),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
-
-
-
-
-
-
-
 
 
 

@@ -149,8 +149,8 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
-    final formKey = GlobalKey<FormState>();
+    //final double height = MediaQuery.of(context).size.height;
+    //final formKey = GlobalKey<FormState>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 65, 100, 140),

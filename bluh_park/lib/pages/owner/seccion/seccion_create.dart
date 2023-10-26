@@ -1,10 +1,12 @@
 import 'package:bluehpark/services/fb_service_secccion.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(const SeccionCreate());
+//void main() => runApp(const SeccionCreate());
 
 class SeccionCreate extends StatefulWidget {
-  const SeccionCreate({super.key});
+  final DocumentReference pisoRef;
+  const SeccionCreate({super.key, required this.pisoRef});
 
   @override
   State<SeccionCreate> createState() => _SeccionCreateState();
@@ -75,8 +77,7 @@ class _SeccionCreateState extends State<SeccionCreate> {
                       'nombre': nameController.text,
                       'descripcion': descriptionController.text,
                     };
-                    createDocumentoASubcoleccion(
-                        "ID-PARQUEO-3", "ID-PISO-1", datos);
+                    createDocumentoASubcoleccion(widget.pisoRef, datos);
                     Navigator.pop(context);
                   },
                   style: ButtonStyle(

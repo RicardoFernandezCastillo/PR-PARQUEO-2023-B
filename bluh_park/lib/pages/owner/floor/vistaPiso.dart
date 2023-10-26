@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:bluehpark/models/to_use/parking.dart';
+import 'package:bluehpark/pages/owner/seccion/seccion_list.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -77,7 +78,7 @@ class _PisoListScreenState extends State<PisoListScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          CreatePisoScreen(idParqueo: widget.idParqueo),
+                          SeccionList(pisoRef: piso.idPiso),
                     ),
                   );
                   // Implementa aquí la lógica que se realizará al hacer clic en el elemento.

@@ -114,7 +114,7 @@ class ProfilePage extends StatelessWidget {
                             );
                           } catch (e) {
                             // Manejar errores de cierre de sesión
-                            ProgressDialog.hide(context);
+                            await ProgressDialog.hide(context);
                             log('Error al cerrar sesión: $e');
                           }
                         },

@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Seccion {
-  late String idSeccion;
+  late DocumentReference idSeccion;
   late String name;
   late String description;
 

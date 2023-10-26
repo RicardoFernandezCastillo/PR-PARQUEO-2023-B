@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class SeccionEdit extends StatefulWidget {
-  String idSeccion;
-  SeccionEdit({super.key, required this.idSeccion});
+  DocumentReference seccionRef;
+  SeccionEdit({super.key, required this.seccionRef});
 
   @override
   State<SeccionEdit> createState() => _SeccionEditState();
@@ -21,21 +21,26 @@ class _SeccionEditState extends State<SeccionEdit> {
   void initState() {
     super.initState();
 
-    getSeccion(); // Carga los datos de la plaza en initState
+    getSeccion(widget.seccionRef); // Carga los datos de la plaza en initState
   }
 
-  Future<void> getSeccion() async {
+  Future<void> getSeccion(DocumentReference seccionRef) async {
     try {
-      // Usa el ID de la plaza para obtener los datos desde Firestore
-      DocumentSnapshot<Map<String, dynamic>> plazaDoc = await FirebaseFirestore
-          .instance
-          .collection('parqueo')
-          .doc('ID-PARQUEO-3')
-          .collection('pisos')
-          .doc('ID-PISO-1')
-          .collection('filas')
-          .doc(widget.idSeccion) // Usa el ID de la plaza pasado como argumento
-          .get();
+
+      DocumentSnapshot<Map<String, dynamic>> plazaDoc =
+          await seccionRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+
+
+      // // Usa el ID de la plaza para obtener los datos desde Firestore
+      // DocumentSnapshot<Map<String, dynamic>> plazaDoc = await FirebaseFirestore
+      //     .instance
+      //     .collection('parqueo')
+      //     .doc('ID-PARQUEO-3')
+      //     .collection('pisos')
+      //     .doc('ID-PISO-1')
+      //     .collection('filas')
+      //     .doc(widget.idSeccion) // Usa el ID de la plaza pasado como argumento
+      //     .get();
 
       if (plazaDoc.exists) {
         Map<String, dynamic> data = plazaDoc.data() as Map<String, dynamic>;
@@ -112,8 +117,7 @@ class _SeccionEditState extends State<SeccionEdit> {
                       'nombre': nameController.text,
                       'descripcion': descriptionController.text,
                     };
-                    editSeccion(
-                        "ID-PARQUEO-3", "ID-PISO-1", widget.idSeccion, datos);
+                    editSeccion(widget.seccionRef, datos);
                     Navigator.pop(context);
                   },
                   style: ButtonStyle(

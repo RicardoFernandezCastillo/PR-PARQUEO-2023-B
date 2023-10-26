@@ -74,7 +74,7 @@ class _HomeOwnerState extends State<HomeOwner> {
                               Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const OwnerParkingsScreen()));
+                                  builder: (context) => const PlazaListScreen()));
                             },
                             iconSize: 50,
                             color: const Color(0xff2e61e6),
