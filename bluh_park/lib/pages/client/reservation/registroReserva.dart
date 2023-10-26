@@ -1,59 +1,19 @@
+import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/material.dart';
 
- 
-
 class Reserva {
-  // final String idReserva;
-
-  // final String idParqueo;
-
-  // final String idPiso;
-
-  // final String idFila;
-
-  // final String vehiculoPermitido;
-
-  // final String placaVehiculo;
-
-  // final String marcaVehiculo;
-  
-  // final String colorVehiculo;
-
-  // final String modeloVehiculo;
-
-  // final bool cuentaCobertura;
-
-  // final String fechaLlegada;
-
-  // final String horaLlegada;
-
-  // final String fechaSalida;
-
-  // final String horaSalida;
-
-  // final String precioTotal;
-
-
   final Map<String, dynamic> cliente;
   final Map<String, dynamic> parqueo;
   final Map<String, dynamic> ticket;
   final Map<String, dynamic> vehiculo;
 
-
-  // Reserva(this.idReserva, this.idParqueo, this.idPiso, this.idFila, this.vehiculoPermitido, 
+  // Reserva(this.idReserva, this.idParqueo, this.idPiso, this.idFila, this.vehiculoPermitido,
   // this.placaVehiculo, this.marcaVehiculo, this.colorVehiculo, this.modeloVehiculo,
   // this.cuentaCobertura, this.fechaLlegada, this.horaLlegada, this.fechaSalida, this.horaSalida,
   // this.precioTotal);
-
   Reserva(this.cliente, this.parqueo, this.ticket, this.vehiculo);
 }
- 
-
-
-
- 
 
 class CreateReservaScreen extends StatelessWidget {
   static const routeName = '/vista-reserva';
@@ -77,10 +37,9 @@ class CreateReservaScreen extends StatelessWidget {
   }
 }
 
-
 class ReservaListScreen extends StatefulWidget {
   //final String idParqueo;
-  
+
   //ReservaListScreen({required this.idParqueo});
 
   @override
@@ -103,15 +62,15 @@ class _ReservaListScreenState extends State<ReservaListScreen> {
 
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AgregarReservaScreen(),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => AgregarReservaScreen(),
+                //   ),
+                // );
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
+                backgroundColor: Colors.blue,
               ),
               child: const Text('Agregar Reserva'),
             ),
@@ -122,15 +81,15 @@ class _ReservaListScreenState extends State<ReservaListScreen> {
   }
 }
 
-
-
 class AgregarReservaScreen extends StatefulWidget {
+  final DataReservationSearch dataReservationSearch;
+  const AgregarReservaScreen({super.key, required this.dataReservationSearch});
+
   @override
-  _AgregarReservaScreenState createState() => _AgregarReservaScreenState();
+  AgregarReservaScreenState createState() => AgregarReservaScreenState();
 }
 
-class _AgregarReservaScreenState extends State<AgregarReservaScreen> {
-
+class AgregarReservaScreenState extends State<AgregarReservaScreen> {
   String vehiculoSeleccionado = 'Autos';
   String coberturaSeleccionada = 'SI';
   TextEditingController idParqueoController = TextEditingController();
@@ -148,7 +107,6 @@ class _AgregarReservaScreenState extends State<AgregarReservaScreen> {
   TextEditingController horaSalidaController = TextEditingController();
   TextEditingController precioTotalController = TextEditingController();
 
-
   Map<String, dynamic>? cliente;
   Map<String, dynamic>? parqueo;
   Map<String, dynamic>? ticket;
@@ -158,7 +116,7 @@ class _AgregarReservaScreenState extends State<AgregarReservaScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Agregar Nueva Reserva'),
+        title: const Text('Realizar Reserva'),
         backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
@@ -299,7 +257,6 @@ class _AgregarReservaScreenState extends State<AgregarReservaScreen> {
                           });
                         },
                       ),
-                      
                       const Text('SI'),
                       Radio(
                         value: 'NO',
@@ -394,7 +351,7 @@ class _AgregarReservaScreenState extends State<AgregarReservaScreen> {
                 await agregarReserva(data);
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
+                backgroundColor: Colors.blue,
               ),
               child: const Text('Reservar'),
             ),
@@ -405,24 +362,13 @@ class _AgregarReservaScreenState extends State<AgregarReservaScreen> {
   }
 }
 
-
-
-
 Future<void> agregarReserva(Map<String, dynamic> datos) async {
-
   // Obtén una referencia a la colección principal, en este caso, 'parqueos'
 
   CollectionReference reserva =
-
       FirebaseFirestore.instance.collection('reserva');
 
   // Obtén una referencia al documento del parqueo
-  
 
-  
   await reserva.doc().set(datos);
-
 }
-
- 
-

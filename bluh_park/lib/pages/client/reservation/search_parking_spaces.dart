@@ -1,46 +1,62 @@
 import 'package:bluehpark/models/inkwell/inkwell_data.dart';
+import 'package:bluehpark/models/to_use/parking.dart';
+import 'package:bluehpark/pages/client/reservation/enable_place.dart';
 import 'package:bluehpark/utilities/inkwell_personalized.dart';
+import 'package:bluehpark/utilities/toast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 // ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
-
-
-
-class SearchPlaceScreen extends StatelessWidget {
-  static const routeName = '/search-place-screen';
-
-  const SearchPlaceScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-
-        body: ParkingSpaces(),
-      ),
-    );
-  }
-}
-
-
 class ParkingSpaces extends StatefulWidget {
-  const ParkingSpaces({
-    super.key,
-    Key? keySon,
-  });
+  final DataReservationSearch dataSearch;
+
+  const ParkingSpaces({Key? key, required this.dataSearch}) : super(key: key);
 
   @override
   State<ParkingSpaces> createState() => _ParkingSpacesState();
 }
 
 class _ParkingSpacesState extends State<ParkingSpaces> {
+  TextEditingController fechaInicioController = TextEditingController();
+  TextEditingController fechaFinController = TextEditingController();
+  TextEditingController tarifaAutomovilController = TextEditingController();
+  TextEditingController tarifaMotoController = TextEditingController();
+  TextEditingController tarifaOtrosController = TextEditingController();
+
   List<bool> isChecked = [false, false, false];
   bool radioValue = false;
-  DateTime? selectedDateArrive;
-
+  String? url;
+  String direccion = '';
+  String nombreParqueo = '...';
   List<DateTime?> selectedDate = [null, null];
   List<TimeOfDay?> selectedTime = [null, null];
+  @override
+  void initState() {
+    super.initState();
+    loadDataParqueo();
+  }
+
+  Future<void> loadDataParqueo() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> parqueoDoc =
+          await widget.dataSearch.idParqueo.get()
+              as DocumentSnapshot<Map<String, dynamic>>;
+
+      Map<String, dynamic> data = parqueoDoc.data() as Map<String, dynamic>;
+      setState(() {
+        radioValue = data['tieneCobertura'];
+        isChecked[0] = data['vehiculosPermitidos']['Motos'];
+        isChecked[1] = data['vehiculosPermitidos']['Autos'];
+        isChecked[2] = data['vehiculosPermitidos']['Otros'];
+        direccion = data['direccion'];
+        nombreParqueo = data['nombre'];
+      });
+    } catch (e) {
+      if (!context.mounted) return;
+      Toast.show(context, e.toString());
+    }
+  }
 
   Future<void> _selectDateAndTimeInitial(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
@@ -51,50 +67,75 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
     if (pickedDate != null) {
       // ignore: use_build_context_synchronously
       final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: selectedTime[0] ?? TimeOfDay.now(),
-      );
+          helpText: 'Seleccione la hora',
+          context: context,
+          initialTime:
+              TimeOfDay.fromDateTime(selectedDate[0] ?? DateTime.now()));
       if (pickedTime != null) {
-        setState(() {
-          selectedDate[0] = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-          selectedTime[0] = pickedTime;
-        });
+        if ((pickedTime.hour > 6 && pickedTime.hour < 22)) {
+          if ((pickedTime.minute == 0 && pickedTime.hour == 22 - 1) ||
+              (pickedTime.hour != 22 - 1)) {
+            setState(() {
+              selectedDate[0] = DateTime(
+                pickedDate.year,
+                pickedDate.month,
+                pickedDate.day,
+                pickedTime.hour,
+                pickedTime.minute,
+              );
+              selectedTime[0] = pickedTime;
+            });
+          }
+        } else {
+          if (!context.mounted) return;
+          Toast.show(context, 'Horario no disponible');
+        }
       }
     }
   }
 
   Future<void> _selectDateAndTimeFinal(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
+      helpText: 'Seleccione una fecha',
       context: context,
-      initialDate:
-          selectedDate[0] ?? DateTime.now().add(const Duration(hours: 1)),
-      firstDate:
-          selectedDate[0] ?? DateTime.now().add(const Duration(hours: 1)),
-      lastDate: selectedDate[0] ?? DateTime.now().add(const Duration(days: 20)),
+      initialDate: selectedDate[0] ??
+          DateTime.now().add(
+            const Duration(hours: 1),
+          ),
+      firstDate: selectedDate[0] ??
+          DateTime.now().add(
+            const Duration(hours: 1),
+          ),
+      lastDate: selectedDate[0]?.add(
+            const Duration(days: 20),
+          ) ??
+          DateTime.now().add(
+            const Duration(days: 20),
+          ),
     );
     if (pickedDate != null) {
       // ignore: use_build_context_synchronously
       final TimeOfDay? pickedTime = await showTimePicker(
+          helpText: 'Seleccione la hora',
           context: context,
           initialTime:
               TimeOfDay.fromDateTime(selectedDate[0] ?? DateTime.now()));
       if (pickedTime != null) {
-        setState(() {
-          selectedDate[1] = DateTime(
-            pickedDate.year,
-            pickedDate.month,
-            pickedDate.day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
-          selectedTime[1] = pickedTime;
-        });
+        if (pickedTime.hour > 6 && pickedTime.hour < 22) {
+          setState(() {
+            selectedDate[1] = DateTime(
+              pickedDate.year,
+              pickedDate.month,
+              pickedDate.day,
+              pickedTime.hour,
+              pickedTime.minute,
+            );
+            selectedTime[1] = pickedTime;
+          });
+        } else {
+          if (!context.mounted) return;
+          Toast.show(context, 'Horario no disponible');
+        }
       }
     }
   }
@@ -131,6 +172,7 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                   child: Stack(
                     children: <Widget>[
                       Image.asset(
+                        // url!,
                         'assets/img_parking_reserve.jpg',
                         width: double.infinity,
                         height: 220,
@@ -147,8 +189,8 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           margin: const EdgeInsets.all(16.0),
-                          child: const Padding(
-                            padding: EdgeInsets.all(10.0),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -156,42 +198,42 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        'Estacionamiento',
-                                        style: TextStyle(
+                                        nombreParqueo,
+                                        style: const TextStyle(
                                           fontSize: 16.5,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ),
-                                    Icon(
+                                    const Icon(
                                       Icons.star,
                                       color: Colors.amber,
                                     ),
-                                    SizedBox(width: 10.0),
-                                    Text(
+                                    const SizedBox(width: 10.0),
+                                    const Text(
                                       '4.0',
                                     ),
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.location_on,
                                       color: Colors.black,
                                     ),
-                                    SizedBox(width: 10.0),
+                                    const SizedBox(width: 10.0),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Av Peru-Colon',
-                                          style: TextStyle(
+                                          direccion,
+                                          style: const TextStyle(
                                             color:
                                                 Color.fromARGB(255, 0, 0, 255),
                                           ),
                                         ),
-                                        Text(
+                                        const Text(
                                           "\$ 20/Hora",
                                           style: TextStyle(
                                             color:
@@ -232,9 +274,10 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                 Expanded(
                   child: InkwellPerzonalized(
                     inkwellData: InkwellData(
-                        isChecked: isChecked[0],
-                        message: 'Motos',
-                        priceString: '\$10'),
+                      isChecked: isChecked[0],
+                      message: 'Motos',
+                      priceString: '\$10',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10.0),
@@ -374,7 +417,15 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       InkWell(
-                        onTap: () => _selectDateAndTimeFinal(context),
+                        onTap: () => {
+                          if (selectedDate[0] != null)
+                            {_selectDateAndTimeFinal(context)}
+                          else
+                            {
+                              Toast.show(context,
+                                  'Primero seleccione la fecha inicial')
+                            }
+                        },
                         child: Row(
                           children: [
                             const Icon(
@@ -430,7 +481,26 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                   style: TextStyle(fontSize: 20),
                 ),
                 onPressed: () async {
-                  searchParking(selectedDate[0] ?? DateTime.now());
+                  DataReservationSearch dataSearch = DataReservationSearch(
+                      idParqueo: widget.dataSearch.idParqueo,
+                      fechaInicio: Timestamp.fromDate(selectedDate[0]!),
+                      fechaFin: Timestamp.fromDate(selectedDate[1]!),
+                      tieneCobertura: radioValue);
+                  if (isChecked[0]) {
+                    dataSearch.tipoVehiculo = 'Automóvil';
+                  } else if (isChecked[1]) {
+                    dataSearch.tipoVehiculo = 'Moto';
+                  } else if (isChecked[2]) {
+                    dataSearch.tipoVehiculo = 'Otro';
+                  }
+                  dataSearch.total = 50.4;
+                  //SelectSpaceScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PlazaListScreen(
+                            dataSearch: dataSearch)), //),
+                  );
                 },
               ),
             )
@@ -438,10 +508,5 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
         ),
       ),
     );
-  }
-
-  void searchParking(DateTime selectedDate) {
-    var selected = selectedDate;
-
   }
 }

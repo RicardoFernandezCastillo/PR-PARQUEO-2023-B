@@ -310,7 +310,7 @@ class FormAccountScreenState extends State<RequetFormScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                    WelcomeScreen(),
+                                    const WelcomeScreen(),
                                   ),
                                 );
                               } catch (e) {
@@ -398,7 +398,8 @@ Future<void> ownerRequestAccount(
       AccountRequestCollection.correo: userData.correoElectronico,
       AccountRequestCollection.genero: userData.genero,
       AccountRequestCollection.tipo: userData.typeUser,
-      AccountRequestCollection.estado: 'pendiente'
+      AccountRequestCollection.estado: 'pendiente',
+      AccountRequestCollection.detalle: 'Peticion de Habilitacion de cuenta'
     });
     if (!context.mounted) return;
     Toast.show(

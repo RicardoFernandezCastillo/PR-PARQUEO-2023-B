@@ -1,12 +1,11 @@
+import 'package:bluehpark/pages/client/reservation/registroReserva.dart';
 import 'package:bluehpark/pages/login/login_page.dart';
 import 'package:bluehpark/pages/login/login_screen.dart';
-import 'package:bluehpark/pages/login/register.dart';
 import 'package:bluehpark/pages/login/signup_screen.dart';
 import 'package:bluehpark/pages/login/welcome_screen.dart';
+import 'package:bluehpark/pages/map/map_client.dart';
 import 'package:bluehpark/pages/owner/parking/registroParqueo.dart';
-import 'package:bluehpark/pages/client/reservation/search_parking_spaces.dart';
 import 'package:bluehpark/pages/client/reservation/enable_place.dart';
-import 'package:bluehpark/pages/client/reservation/nearby_parking.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:bluehpark/firebase_options.dart';
@@ -43,12 +42,14 @@ class MyApp extends StatelessWidget {
           LoginPage.routeName: (context) => LoginPage(),
 
           CreatePlaceScreen.routeName: (context) => const CreatePlaceScreen(),
-          SelectParkingScreen.routeName:(context) => const SelectParkingScreen(),
+          //SelectParkingScreen.routeName:(context) => const SelectParkingScreen(),
           SelectSpaceScreen.routeName:(context) => const SelectSpaceScreen(),
 
           RegistroParqueoScreen.routeName: (context) => const RegistroParqueoScreen(),
+          
+          //SearchPlaceScreen.routeName:(context) => const SearchPlaceScreen(),
 
-          SearchPlaceScreen.routeName:(context) => const SearchPlaceScreen(),
+          CreateReservaScreen.routeName: (context) => CreateReservaScreen()
         },
       ),
     );

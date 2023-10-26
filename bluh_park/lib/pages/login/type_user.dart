@@ -5,9 +5,11 @@ import 'package:bluehpark/models/coleccion/collection_field.dart';
 import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/pages/administrator/accounts_request.dart';
 import 'package:bluehpark/pages/client/home_client_page.dart';
+import 'package:bluehpark/pages/client/navigation_bar.dart';
 import 'package:bluehpark/pages/login/register.dart';
 import 'package:bluehpark/pages/owner/form_data/request_data.dart';
 import 'package:bluehpark/pages/owner/home_owner_page.dart';
+import 'package:bluehpark/pages/owner/navigation_bar.dart';
 import 'package:bluehpark/utilities/progressbar.dart';
 import 'package:bluehpark/utilities/toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -127,7 +129,7 @@ class TypeUser extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const HomeClient(),
+                                    builder: (context) => const MenuClient(),
                                   ),
                                 );
                               }
@@ -138,7 +140,7 @@ class TypeUser extends StatelessWidget {
                                   Navigator.push(
                                   context,
                                     MaterialPageRoute(
-                                      builder: (context) => const HomeOwner(),
+                                      builder: (context) => const MenuOwner(),
                                     ),
                                   );
                               }

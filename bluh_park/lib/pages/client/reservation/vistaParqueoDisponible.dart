@@ -1,23 +1,30 @@
 import 'dart:developer';
-
+import 'package:bluehpark/models/Parqueo.dart';
+import 'package:bluehpark/models/to_use/parking.dart';
+import 'package:bluehpark/pages/client/reservation/search_parking_spaces.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/material.dart';
 
-import '../../../Models/Parqueo.dart';
+
+
 
 
 class ParqueoDisponibleListScreen extends StatefulWidget {
 
     const ParqueoDisponibleListScreen({super.key});
     static const routeName = '/vista-parqueoDisponible';
+  
+   
+  
     @override
   
-    ParqueoDisponibleListScreenState createState() => ParqueoDisponibleListScreenState();
+    _ParqueoDisponibleListScreenState createState() => _ParqueoDisponibleListScreenState();
   
   }
   
-  class ParqueoDisponibleListScreenState extends State<ParqueoDisponibleListScreen> {
+   
+  
+  class _ParqueoDisponibleListScreenState extends State<ParqueoDisponibleListScreen> {
   
     @override
   
@@ -88,23 +95,23 @@ class ParqueoDisponibleListScreen extends StatefulWidget {
                 return InkWell(
   
                   onTap: () {
-  
+                    
                     // Aquí puedes definir la acción que se realizará al hacer clic en el elemento.
   
                     // Por ejemplo, puedes abrir una pantalla de detalles de la plaza.
   
                     //abrirDetallesPlaza(plaza);
-                    Navigator.push(
+                    // Navigator.push(
   
-                      context,
+                    //   context,
   
-                      MaterialPageRoute(
+                    //   MaterialPageRoute(
   
-                      builder: (context) => MostrarDatosParqueoScreen(idParqueo:parqueo.idParqueo),
+                    //   builder: (context) => MostrarDatosParqueoScreen(idParqueo:parqueo.idParqueo),
   
-                      ),
+                    //   ),
   
-                    );
+                    // );
   
                   },
                   
@@ -116,7 +123,7 @@ class ParqueoDisponibleListScreen extends StatefulWidget {
   
                     subtitle: Text(
   
-                        parqueo.tieneCobertura ? 'Con Cobertura' : 'Sin Cobertura'),
+                        parqueo.direccion),
   
                     
   
@@ -138,12 +145,19 @@ class ParqueoDisponibleListScreen extends StatefulWidget {
     }
   
   }
+
+
   Stream<QuerySnapshot> obtenerParqueosStream() {
 
     try {
   
       CollectionReference parqueosCollection = FirebaseFirestore.instance
+  
           .collection('parqueo');
+  
+  
+          
+  
       return parqueosCollection
   
           .snapshots(); // Devuelve un Stream que escucha cambios en la colección.
@@ -158,11 +172,12 @@ class ParqueoDisponibleListScreen extends StatefulWidget {
   
   }
 
+
 class MostrarDatosParqueoScreen extends StatefulWidget {
   
 
-  final DocumentReference idParqueo; // Recibe el ID de la plaza
-  MostrarDatosParqueoScreen({required this.idParqueo});
+  final DataReservationSearch dataSearch; // Recibe el ID de la plaza
+  const MostrarDatosParqueoScreen({super.key, required this.dataSearch});
 
   @override
   State<MostrarDatosParqueoScreen> createState() => _MostrarDatosParqueoScreenState();
@@ -173,9 +188,27 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
   TextEditingController horaAperturaController = TextEditingController();
   TextEditingController horaCierreController = TextEditingController();
   TextEditingController tarifaAutomovilController = TextEditingController();
+  TextEditingController tarifaMotoController = TextEditingController();
+  TextEditingController tarifaOtrosController = TextEditingController();
 
   Map<String, bool>? vehiculosPermitidosMap;
   Map<String, dynamic>? tarifaAutomovilMap;
+  Map<String, dynamic>? tarifaMotoMap;
+  Map<String, dynamic>? tarifaOtrosMap;
+
+
+  Timestamp? timeHoraApertura;
+  Timestamp? timeHoraCierre;
+
+  DateTime? auxiHoraApertura;
+  DateTime? auxiHoraCierre;
+
+  String? stringHoraApertura;
+  String? stringHoraCierre;
+
+  bool? tieneCobertura;
+  String? coberturaTexto;
+  
 
   @override
   void initState() {
@@ -185,7 +218,8 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
 
   Future<void> cargarDatosParqueo() async {
     try {
-      DocumentReference parqueoRef = widget.idParqueo;
+
+      DocumentReference parqueoRef = widget.dataSearch.idParqueo;
       DocumentSnapshot<Map<String, dynamic>> plazaDoc =
           await parqueoRef.get() as DocumentSnapshot<Map<String, dynamic>>;
 
@@ -197,16 +231,48 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
           horaAperturaController.text = data['horaApertura']?.toString() ?? '';
           horaCierreController.text = data['horaCierre']?.toString() ?? '';
 
+          timeHoraApertura = data['horaApertura'];
+          timeHoraCierre = data['horaCierre'];
+
+          auxiHoraApertura = timeHoraApertura?.toDate();
+          auxiHoraCierre = timeHoraCierre?.toDate();
+
+          stringHoraApertura = '${auxiHoraApertura?.hour}:${auxiHoraCierre?.minute}';
+          stringHoraCierre = '${auxiHoraCierre?.hour}:${auxiHoraCierre?.minute}';
+
          
           tarifaAutomovilMap = data['tarifaAutomovil'] as Map<String, dynamic>?;
           if (tarifaAutomovilMap != null) {
             tarifaAutomovilController.text =
                 'Automóviles: Hora/${tarifaAutomovilMap!['Hora'] ?? '-'}bs Día/${tarifaAutomovilMap!['Dia'] ?? '-'}bs';
           }
+
+          tarifaMotoMap = data['tarifaMoto'] as Map<String, dynamic>?;
+          if (tarifaMotoMap != null) {
+            tarifaMotoController.text =
+                'Motos: Hora/${tarifaMotoMap!['Hora'] ?? '-'}bs Día/${tarifaMotoMap!['Dia'] ?? '-'}bs';
+          }
+
+          tarifaOtrosMap = data['tarifaOtro'] as Map<String, dynamic>?;
+          if (tarifaOtrosMap != null) {
+            tarifaOtrosController.text =
+                'Otros: Hora/${tarifaOtrosMap!['Hora'] ?? '-'}bs Día/${tarifaOtrosMap!['Dia'] ?? '-'}bs';
+          }
+
+          tieneCobertura = data['tieneCobertura'];
+
+          if(tieneCobertura == true)
+          {
+            coberturaTexto = "Cuenta con cobertura";
+          }
+          else
+          {
+            coberturaTexto = "No cuenta con cobertura";
+          }
         });
       }
     } catch (e) {
-      print('Error al cargar los datos de la plaza: $e');
+      log('Error al cargar los datos de la plaza: $e');
     }
   }
 
@@ -264,6 +330,7 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
             ),
 
             // Fila de Horario
+            const SizedBox(width: 20.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -273,7 +340,7 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Hora Apertura:'),
-                    Text(horaAperturaController.text),
+                    Text(stringHoraApertura.toString()),
                   ],
                 ),
                 const SizedBox(width: 20.0),
@@ -281,7 +348,7 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Hora Cierre:'),
-                    Text(horaCierreController.text),
+                    Text(stringHoraCierre.toString()),
                   ],
                 ),
               ],
@@ -290,16 +357,54 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
             // Cuadro de texto medio amplio
             const SizedBox(height: 20.0),
             const Text(
-              'Texto Medio Amplio:',
+              'TARIFAS:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10.0),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Tarifas'),
+                
                 Text(tarifaAutomovilController.text),
+                Text(tarifaMotoController.text),
+                Text(tarifaOtrosController.text),
               ],
+            ),
+
+            const SizedBox(height: 20.0),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(coberturaTexto.toString(), 
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold, // Esto establece el estilo en negrita
+                  fontSize: 16.0, // Puedes ajustar el tamaño de fuente según tus necesidades
+                  // Otros atributos de estilo, como color, fuente personalizada, etc., se pueden configurar aquí
+                ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 40.0),
+
+            ElevatedButton(
+              onPressed: () async{
+                    Navigator.push(
+  
+                      context,
+  
+                      MaterialPageRoute(
+  
+                      builder: (context) => ParkingSpaces(dataSearch:widget.dataSearch),
+  
+                      ),
+  
+                    );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+              ),
+              child: const Text('Hacer Reservación'),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:bluehpark/pages/client/home_client_page.dart';
 import 'package:bluehpark/pages/client/ticket_list_page.dart';
+import 'package:bluehpark/pages/profile.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(const MenuClient());
@@ -18,7 +19,7 @@ class _MenuClientState extends State<MenuClient> {
     const HomeClient(),
     const TicketsList(),
     const Text('Notificaciones de reserva'),
-    const Text('Perfil'),
+    const ProfilePage(),
   ];
 
   @override

@@ -1,4 +1,7 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_map_location_picker/flutter_map_location_picker.dart';
+import 'package:latlong2/latlong.dart';
 
 class LocationPicker extends StatefulWidget {
   const LocationPicker({Key? key}) : super(key: key);
@@ -9,6 +12,8 @@ class LocationPicker extends StatefulWidget {
 
 class _LocationPickerState extends State<LocationPicker> {
   String address = '';
+  LocationResult? selectedLocation;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,19 +36,22 @@ class _LocationPickerState extends State<LocationPicker> {
             child: Center(child: Text(address)),
           ),
           SizedBox(
-              height: 500,
-              child: OpenStreetMapSearchAndPick(
-                  center: LatLong(23, 89),
-                  onPicked: (pickedData) {
-                    setState(() {
-                      address = pickedData.addressName +
-                          pickedData.latLong.latitude.toString() +
-                          pickedData.latLong.longitude.toString();
-                    });
-                    print(pickedData.latLong.latitude);
-                    print(pickedData.latLong.longitude);
-                    print(pickedData.address);
-                  }))
+            height: 500,
+            child: MapLocationPicker(
+              initialLocation:
+                  const LatLng(-17.396843874763828, -66.16765210043515),
+              onPicked: (pickedData) {
+                setState(() {
+                  address = pickedData.address +
+                      pickedData.latitude.toString() +
+                      pickedData.longitude.toString();
+                });
+                log(pickedData.latitude.toString());
+                log(pickedData.longitude.toString());
+                log(pickedData.address);
+              },
+            ),
+          ),
         ])));
   }
 }

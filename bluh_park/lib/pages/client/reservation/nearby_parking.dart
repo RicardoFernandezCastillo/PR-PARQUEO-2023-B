@@ -1,23 +1,23 @@
 import 'dart:developer';
 import 'package:bluehpark/models/to_use/parking.dart';
+import 'package:bluehpark/pages/client/reservation/vistaParqueoDisponible.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class SelectParkingScreen extends StatelessWidget {
   static const routeName = '/nearby-parking';
-
   const SelectParkingScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-              debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true
-        ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(useMaterial3: true),
       home: Scaffold(
         appBar: AppBar(
-            title: const Text('Parqueos Cercanos Disponibles',
-            style: TextStyle(color: Colors.white),),
+            title: const Text(
+              'Parqueos Cercanos Disponibles',
+              style: TextStyle(color: Colors.white),
+            ),
             backgroundColor: const Color.fromARGB(255, 5, 126, 225)),
         body: const PlazaListScreen(),
       ),
@@ -54,21 +54,20 @@ class PlazaListScreenState extends State<PlazaListScreen> {
               snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
             return Parqueo(
-              idParqueo: document.reference,
-              nombre: data['nombre'],
-              direccion: data['direccion'],
-              ubicacion: data['ubicacion'],
-              tieneCobertura: data['tieneCobertura'],
-              descripcion: data['descripcion'],
-              vehiculosPermitidos: data['vehiculosPermitidos'],
-              nit: data['nit'],
-              tarifaAutomovil: data['tarifaAutomovil'],
-              tarifaMoto: data['tarifaMoto'],
-              tarifaOtro: data['tarifaOtro'],
-              horaApertura: data['horaApertura'],
-              horaCierre: data['horaCierre'],
-              idDuenio: data['idDuenio'] 
-            );
+                idParqueo: document.reference,
+                nombre: data['nombre'],
+                direccion: data['direccion'],
+                ubicacion: data['ubicacion'],
+                tieneCobertura: data['tieneCobertura'],
+                descripcion: data['descripcion'],
+                vehiculosPermitidos: data['vehiculosPermitidos'],
+                nit: data['nit'],
+                tarifaAutomovil: data['tarifaAutomovil'],
+                tarifaMoto: data['tarifaMoto'],
+                tarifaOtro: data['tarifaOtro'],
+                horaApertura: data['horaApertura'],
+                horaCierre: data['horaCierre'],
+                idDuenio: data['idDuenio']);
           }).toList();
           return ListView.builder(
             itemCount: parqueos.length,
@@ -90,20 +89,22 @@ class PlazaListScreenState extends State<PlazaListScreen> {
                           fontSize: 18.0, fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
-                      parqueo.tieneCobertura ? 'Con Cobertura' : 'Sin Cobertura',
+                      parqueo.tieneCobertura
+                          ? 'Con Cobertura'
+                          : 'Sin Cobertura',
                       style: const TextStyle(fontSize: 16.0),
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.car_repair, color: Colors.blue),
                       onPressed: () {
+                        DataReservationSearch dataSearch = DataReservationSearch(idParqueo: parqueo.idParqueo);
                         // Implementa aquí la lógica para abrir la pantalla de edición.
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) =>
-                        //         EditarPlazaScreen(idPlaza: parqueo.idPlaza),
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MostrarDatosParqueoScreen(dataSearch: dataSearch)
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -112,8 +113,6 @@ class PlazaListScreenState extends State<PlazaListScreen> {
             },
           );
         },
-
-
       ),
     );
   }
@@ -191,7 +190,11 @@ Future<List<Plaza>> getPlaces(
     // Mapea los documentos en objetos de la clase Plaza
     List<Plaza> plazas = querySnapshot.docs.map((DocumentSnapshot document) {
       Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-      return Plaza(nombre:data['nombre'],tieneCobertura: data['tieneCobertura'],idPlaza: document.reference,estado: data['estado']);
+      return Plaza(
+          nombre: data['nombre'],
+          tieneCobertura: data['tieneCobertura'],
+          idPlaza: document.reference,
+          estado: data['estado']);
     }).toList();
 
     return plazas;

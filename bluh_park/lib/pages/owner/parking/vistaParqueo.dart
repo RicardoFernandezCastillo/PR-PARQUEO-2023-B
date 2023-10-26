@@ -1,12 +1,12 @@
 import 'dart:developer';
 
+import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
 
 import '../floor/vistaPiso.dart';
 
-import '../../../Models/Parqueo.dart';
 class Plaza {
 
   final String nombre;
@@ -49,9 +49,6 @@ class CreateParqueoScreen extends StatelessWidget {
   }
 
 }
-
- 
-
 class ParqueoListScreen extends StatefulWidget {
 
   const ParqueoListScreen({super.key});
@@ -114,10 +111,10 @@ class _ParqueoListScreenState extends State<ParqueoListScreen> {
 
               String idDocumento = document.id; // Obtener el ID del documento
 
-              return Parqueo(idDocumento, data['nombre'], data['direccion'], data['ubicacion'],
-                             data['tieneCobertura'], data['descripcion'], data['vehiculosPermitidos'], data['nit'],
-                             data['tarifaMoto'], data['tarifaAutomovil'], data['tarifaOtro'], 
-                             data['horaApertura'], data['horaCierre'], data['idDuenio']);
+              return Parqueo(idParqueo: document.reference,nombre: data['nombre'],direccion: data['direccion'],ubicacion: data['ubicacion'],
+                             tieneCobertura: data['tieneCobertura'],descripcion: data['descripcion'],vehiculosPermitidos: data['vehiculosPermitidos'],nit: data['nit'],
+                             tarifaMoto:data['tarifaMoto'],tarifaAutomovil: data['tarifaAutomovil'],tarifaOtro: data['tarifaOtro'], 
+                             horaApertura:data['horaApertura'],horaCierre: data['horaCierre'],idDuenio: data['idDuenio']);
                               
 
 
@@ -180,17 +177,17 @@ class _ParqueoListScreenState extends State<ParqueoListScreen> {
 
                           // Implementa aquí la lógica para abrir la pantalla de edición.
 
-                          Navigator.push(
+                          // Navigator.push(
 
-                            context,
+                          //   context,
 
-                            MaterialPageRoute(
+                          //   MaterialPageRoute(
 
-                              builder: (context) => EditarParqueoScreen(idParqueo:parqueo.idParqueo),
+                          //     builder: (context) => EditarParqueoScreen(idParqueo:parqueo.idParqueo),
 
-                            ),
+                          //   ),
 
-                          );
+                          // );
 
                         },
 
@@ -596,379 +593,379 @@ class _AgregarParqueoScreen extends State<AgregarParqueoScreen> {
 
  
 
-class EditarParqueoScreen extends StatefulWidget {
+// class EditarParqueoScreen extends StatefulWidget {
 
-  final String idParqueo; // Recibe el ID de la plaza
+//   final DocumentReference idParqueo; // Recibe el ID de la plaza
 
-  const EditarParqueoScreen({super.key, required this.idParqueo});
-
- 
-
-  @override
-
-  EditarParqueoScreenState createState() => EditarParqueoScreenState();
-
-}
+//   const EditarParqueoScreen({super.key, required this.idParqueo});
 
  
 
-class EditarParqueoScreenState extends State<EditarParqueoScreen> {
+//   @override
 
-  TextEditingController nombreController = TextEditingController();
+//   EditarParqueoScreenState createState() => EditarParqueoScreenState();
 
-  TextEditingController pisoYFilaController = TextEditingController();
-
- 
-
-  String tipoVehiculo = '';
-
-  bool tieneCobertura = false;
+// }
 
  
 
-  @override
+// class EditarParqueoScreenState extends State<EditarParqueoScreen> {
 
-  void initState() {
+//   TextEditingController nombreController = TextEditingController();
 
-    super.initState();
-
-    cargarDatosPlaza(); // Carga los datos de la plaza en initState
-
-  }
+//   TextEditingController pisoYFilaController = TextEditingController();
 
  
 
-  Future<void> cargarDatosPlaza() async {
+//   String tipoVehiculo = '';
 
-    try {
-
-      // Usa el ID de la plaza para obtener los datos desde Firestore
-
-      DocumentSnapshot<Map<String, dynamic>> plazaDoc = await FirebaseFirestore
-
-          .instance
-
-          .collection('parqueo')
-
-          .doc('ID-PARQUEO-3')
-
-          .collection('pisos')
-
-          .doc('ID-PISO-1')
-
-          .collection('filas')
-
-          .doc('ID-FILA-1')
-
-          .collection('plazas')
-
-          .doc(widget.idParqueo) // Usa el ID de la plaza pasado como argumento
-
-          .get();
+//   bool tieneCobertura = false;
 
  
 
-      if (plazaDoc.exists) {
+//   @override
 
-        Map<String, dynamic> data = plazaDoc.data() as Map<String, dynamic>;
+//   void initState() {
 
-        setState(() {
+//     super.initState();
 
-          nombreController.text = data['nombre'];
+//     cargarDatosPlaza(); // Carga los datos de la plaza en initState
 
-          tipoVehiculo = data['tipoVehiculo'];
-
-          tieneCobertura = data['tieneCobertura'];
-
-          pisoYFilaController.text = data['piso_fila'];
-
-        });
-
-      }
-
-    } catch (e) {
-
-      log('Error al cargar los datos de la plaza: $e');
-
-    }
-
-  }
+//   }
 
  
 
-  @override
+//   Future<void> cargarDatosPlaza() async {
 
-  Widget build(BuildContext context) {
+//     try {
 
-    return Scaffold(
+//       // Usa el ID de la plaza para obtener los datos desde Firestore
 
-      appBar: AppBar(
+//       DocumentSnapshot<Map<String, dynamic>> plazaDoc = await FirebaseFirestore
 
-        title: const Text('Editar Plaza'),
+//           .instance
 
-        backgroundColor: Colors.blue,
+//           .collection('parqueo')
 
-      ),
+//           .doc('ID-PARQUEO-3')
 
-      body: Padding(
+//           .collection('pisos')
 
-        padding: const EdgeInsets.all(16.0),
+//           .doc('ID-PISO-1')
 
-        child: Column(
+//           .collection('filas')
 
-          crossAxisAlignment: CrossAxisAlignment.center,
+//           .doc('ID-FILA-1')
 
-          children: <Widget>[
+//           .collection('plazas')
 
-            TextFormField(
+//           .doc(widget.idParqueo) // Usa el ID de la plaza pasado como argumento
 
-              controller: nombreController,
+//           .get();
 
-              decoration: const InputDecoration(
+ 
 
-                labelText: 'Nombre',
+//       if (plazaDoc.exists) {
 
-                fillColor: Colors.blue,
+//         Map<String, dynamic> data = plazaDoc.data() as Map<String, dynamic>;
 
-                focusedBorder: OutlineInputBorder(
+//         setState(() {
 
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+//           nombreController.text = data['nombre'];
 
-                ),
+//           tipoVehiculo = data['tipoVehiculo'];
 
-              ),// Establece el valor inicial desde Firestore
+//           tieneCobertura = data['tieneCobertura'];
 
-            ),
+//           pisoYFilaController.text = data['piso_fila'];
 
-            const SizedBox(height: 20.0),
+//         });
 
-            Container(
+//       }
 
-              alignment: Alignment.topLeft,
+//     } catch (e) {
 
-              child: const Text(
+//       log('Error al cargar los datos de la plaza: $e');
 
-                'Tipo de Vehículo',
+//     }
 
-                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+//   }
 
-              ),
+ 
 
-            ),
+//   @override
 
-            Row(
+//   Widget build(BuildContext context) {
 
-              children: <Widget>[
+//     return Scaffold(
 
-                Radio(
+//       appBar: AppBar(
 
-                  value: 'Moto',
+//         title: const Text('Editar Plaza'),
 
-                  groupValue: tipoVehiculo,
+//         backgroundColor: Colors.blue,
 
-                  onChanged: (val) {
+//       ),
 
-                    setState(() {
+//       body: Padding(
 
-                      tipoVehiculo = val!;
+//         padding: const EdgeInsets.all(16.0),
 
-                    });
+//         child: Column(
 
-                  },
+//           crossAxisAlignment: CrossAxisAlignment.center,
 
-                ),
+//           children: <Widget>[
 
-                const Text('Moto'),
+//             TextFormField(
 
-                Radio(
+//               controller: nombreController,
 
-                  value: 'Automóvil',
+//               decoration: const InputDecoration(
 
-                  groupValue: tipoVehiculo,
+//                 labelText: 'Nombre',
 
-                  onChanged: (val) {
+//                 fillColor: Colors.blue,
 
-                    setState(() {
+//                 focusedBorder: OutlineInputBorder(
 
-                      tipoVehiculo = val!;
+//                   borderSide: BorderSide(color: Colors.blue, width: 2.0),
 
-                    });
+//                 ),
 
-                  },
+//               ),// Establece el valor inicial desde Firestore
 
-                ),
+//             ),
 
-                const Text('Automóvil'),
+//             const SizedBox(height: 20.0),
 
-                Radio(
+//             Container(
 
-                  value: 'Otro',
+//               alignment: Alignment.topLeft,
 
-                  groupValue: tipoVehiculo,
+//               child: const Text(
 
-                  onChanged: (val) {
+//                 'Tipo de Vehículo',
 
-                    setState(() {
+//                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
 
-                      tipoVehiculo = val!;
+//               ),
 
-                    });
+//             ),
 
-                  },
+//             Row(
 
-                ),
+//               children: <Widget>[
 
-                const Text('Otro'),
+//                 Radio(
 
-              ],
+//                   value: 'Moto',
 
-            ),
+//                   groupValue: tipoVehiculo,
 
-            const SizedBox(height: 20.0),
+//                   onChanged: (val) {
 
-            Container(
+//                     setState(() {
 
-                alignment: Alignment.topLeft,
+//                       tipoVehiculo = val!;
 
-                child: const Text('¿Tiene Cobertura?',
+//                     });
 
-                    style: TextStyle(
+//                   },
 
-                        fontSize: 16.0, fontWeight: FontWeight.bold))),
+//                 ),
 
-            Row(
+//                 const Text('Moto'),
 
-              children: <Widget>[
+//                 Radio(
 
-                Radio(
+//                   value: 'Automóvil',
 
-                  value: true,
+//                   groupValue: tipoVehiculo,
 
-                  groupValue: tieneCobertura,
+//                   onChanged: (val) {
 
-                  onChanged: (val) {
+//                     setState(() {
 
-                    setState(() {
+//                       tipoVehiculo = val!;
 
-                      tieneCobertura = val!;
+//                     });
 
-                    });
+//                   },
 
-                  },
+//                 ),
 
-                ),
+//                 const Text('Automóvil'),
 
-                const Text('Sí'),
+//                 Radio(
 
-                Radio(
+//                   value: 'Otro',
 
-                  value: false,
+//                   groupValue: tipoVehiculo,
 
-                  groupValue: tieneCobertura,
+//                   onChanged: (val) {
 
-                  onChanged: (val) {
+//                     setState(() {
 
-                    setState(() {
+//                       tipoVehiculo = val!;
 
-                      tieneCobertura = val!;
+//                     });
 
-                    });
+//                   },
 
-                  },
+//                 ),
 
-                ),
+//                 const Text('Otro'),
 
-                const Text('No'),
+//               ],
 
-              ],
+//             ),
 
-            ),
+//             const SizedBox(height: 20.0),
 
-            const SizedBox(height: 20.0),
+//             Container(
 
-            TextFormField(
+//                 alignment: Alignment.topLeft,
 
-              controller: pisoYFilaController,
+//                 child: const Text('¿Tiene Cobertura?',
 
-              decoration: const InputDecoration(
+//                     style: TextStyle(
 
-                labelText: 'Piso y Fila',
+//                         fontSize: 16.0, fontWeight: FontWeight.bold))),
 
-                fillColor: Colors.blue,
+//             Row(
 
-                focusedBorder: OutlineInputBorder(
+//               children: <Widget>[
 
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+//                 Radio(
 
-                ),
+//                   value: true,
 
-              ) // Establece el valor inicial desde Firestore
+//                   groupValue: tieneCobertura,
 
-            ),
+//                   onChanged: (val) {
 
-            const SizedBox(height: 20.0),
+//                     setState(() {
 
-            ElevatedButton(
+//                       tieneCobertura = val!;
 
-              onPressed: () async {
+//                     });
 
-                Map<String, dynamic> datos = {
+//                   },
 
-                  'nombre': nombreController.text, // Nombre de la plaza
+//                 ),
 
-                  'tipoVehiculo': tipoVehiculo, // Tipo de vehículo permitido
+//                 const Text('Sí'),
 
-                  'tieneCobertura':
+//                 Radio(
 
-                      tieneCobertura, // Indica si tiene cobertura o no
+//                   value: false,
 
-                  'piso_Fila': pisoYFilaController.text, // Piso y Fila
+//                   groupValue: tieneCobertura,
 
-                  // Puedes agregar otros campos según tus necesidades
+//                   onChanged: (val) {
 
-                };
+//                     setState(() {
 
-                // Llama a la función para actualizar el documento en Firestore
+//                       tieneCobertura = val!;
 
-                await editarPlaza(
+//                     });
 
-                    'ID-PARQUEO-3',
+//                   },
 
-                    'ID-PISO-1',
+//                 ),
 
-                    'ID-FILA-1',
+//                 const Text('No'),
 
-                    widget.idParqueo,
+//               ],
 
-                    datos); // Usa el ID de la plaza pasado como argumento
+//             ),
 
-                // Regresa a la pantalla anterior con los datos actualizados
+//             const SizedBox(height: 20.0),
 
-                Navigator.pop(
+//             TextFormField(
 
-                  context //Se puede enviar Un objeto plaza
+//               controller: pisoYFilaController,
 
-                );
+//               decoration: const InputDecoration(
 
-              },
+//                 labelText: 'Piso y Fila',
 
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+//                 fillColor: Colors.blue,
 
-              child: const Text('Guardar Cambios'),
+//                 focusedBorder: OutlineInputBorder(
 
-            ),
+//                   borderSide: BorderSide(color: Colors.blue, width: 2.0),
 
-          ],
+//                 ),
 
-        ),
+//               ) // Establece el valor inicial desde Firestore
 
-      ),
+//             ),
 
-    );
+//             const SizedBox(height: 20.0),
 
-  }
+//             ElevatedButton(
 
-}
+//               onPressed: () async {
+
+//                 Map<String, dynamic> datos = {
+
+//                   'nombre': nombreController.text, // Nombre de la plaza
+
+//                   'tipoVehiculo': tipoVehiculo, // Tipo de vehículo permitido
+
+//                   'tieneCobertura':
+
+//                       tieneCobertura, // Indica si tiene cobertura o no
+
+//                   'piso_Fila': pisoYFilaController.text, // Piso y Fila
+
+//                   // Puedes agregar otros campos según tus necesidades
+
+//                 };
+
+//                 // Llama a la función para actualizar el documento en Firestore
+
+//                 await editarPlaza(
+
+//                     'ID-PARQUEO-3',
+
+//                     'ID-PISO-1',
+
+//                     'ID-FILA-1',
+
+//                     widget.idParqueo,
+
+//                     datos); // Usa el ID de la plaza pasado como argumento
+
+//                 // Regresa a la pantalla anterior con los datos actualizados
+
+//                 Navigator.pop(
+
+//                   context //Se puede enviar Un objeto plaza
+
+//                 );
+
+//               },
+
+//               style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+
+//               child: const Text('Guardar Cambios'),
+
+//             ),
+
+//           ],
+
+//         ),
+
+//       ),
+
+//     );
+
+//   }
+
+// }
 
 
 Future<void> agregarParqueo(Map<String, dynamic> datos) async {

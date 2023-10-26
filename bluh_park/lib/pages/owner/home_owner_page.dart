@@ -1,4 +1,5 @@
 import 'package:bluehpark/pages/map/map_owner.dart';
+import 'package:bluehpark/pages/owner/parking/owner_parkings.dart';
 import 'package:flutter/material.dart';
 
 class HomeOwner extends StatefulWidget {
@@ -69,7 +70,11 @@ class _HomeOwnerState extends State<HomeOwner> {
                           IconButton(
                             icon: const Icon(Icons.directions_car),
                             onPressed: () {
-                              // Agrega la lógica para el botón 'Mis parqueos' aquí
+                              //OwnerParkingsScreen
+                              Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const OwnerParkingsScreen()));
                             },
                             iconSize: 50,
                             color: const Color(0xff2e61e6),
@@ -198,11 +203,16 @@ class _HomeOwnerState extends State<HomeOwner> {
                   elevation: 4,
                   margin: const EdgeInsets.symmetric(horizontal: 40),
                   child: Container(
-                    height: 100,
+                    height: 120,
                     padding: const EdgeInsets.all(16),
                     child: const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        Icon(
+                          Icons.map_outlined,
+                          size: 40,
+                          color: Colors.green,
+                        ),
                         ListTile(
                           title: Text(
                             "Ubicación Mis Parqueos",

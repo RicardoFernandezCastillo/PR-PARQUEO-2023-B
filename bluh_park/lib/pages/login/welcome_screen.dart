@@ -3,136 +3,114 @@ import 'package:bluehpark/pages/login/login_page.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  static const routeName = '/welcome-screen';
-
   const WelcomeScreen({super.key});
-
-  /*
-  Widget routeButton(Color buttonColor, String title, Color textColor, BuildContext context) {
-    return Container(
-      height: 80,
-      width: double.infinity,
-      padding: const EdgeInsets.only(top: 25, left: 24, right: 24),
-      child: RaisedButton(
-        elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-        color: buttonColor,
-        onPressed: () => context,
-        child: Text(title, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: textColor,),),
-      ),
-    );
-  }
-  */
+  static const routeName = '/welcome-screen';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: NetworkImage(
-                      'https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE4fHx8ZW58MHx8fHw%3D&w=1000&q=80'),
-                  fit: BoxFit.fill),
+      backgroundColor: Colors.white,
+      body: Container(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Column(
+              children: [
+                Icon(
+                  Icons.car_repair_sharp,
+                  size: 200,
+                  color: Colors.indigo[700],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Welcome to ',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        color: Colors.black87,
+                        fontSize: 33,
+                        fontWeight: FontWeight.w200,
+                      ),
+                    ),
+                    Text(
+                      'BluhPark',
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        fontSize: 35,
+                        fontFamily: 'Urbanist',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  ],
+                )
+              ],
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Expanded(
-                flex: 6,
-                child: Padding(
-                  padding: EdgeInsets.only(top: 60, left: 25),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Bienvenido',
-                        style: TextStyle(
-                            fontSize: 55,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                      Text(
-                        'Bluh Park',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.white),
-                      ),
-                    ],
+            Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () => {
+                    Navigator.of(context)
+                            .pushNamed(LoginPage.routeName)
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 60,
+                      vertical: 30,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: Colors.indigo[700],
+                  ),
+                  child: const Text(
+                    'Iniciar Sesion',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Column(
-                  children: [
-                    //const Text('Usuario con sesión Iniciadada', style: TextStyle(fontSize: 24),),
-                    Container(
-                      height: 80,
-                      width: 250, //corregir no dinamico****
-                      padding:
-                          const EdgeInsets.only(top: 25, left: 24, right: 24),
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.of(context)
-                            .pushNamed(LoginPage.routeName),
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-
-                          //backgroundColor: Colors.indigo,
-
-                          //color: Colors.indigo,
-                        ),
-                        child: const Text(
-                          'Iniciar Sesión',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black45,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 80,
-                      width: double.infinity,
-                      padding:
-                          const EdgeInsets.only(top: 25, left: 24, right: 24),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          //color: Colors.white,
-                        ),
-                        onPressed: () => {
-                              Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const TypeUser(),
-                              ),
-                            )
-                        },
-                        child: const Text(
-                          'Crear Cuenta',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black45,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                const SizedBox(
+                  height: 20,
                 ),
-              ),
-            ],
-          ),
-        ],
+                ElevatedButton(
+                  onPressed: () => {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TypeUser(),
+                      ),
+                    )
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 60,
+                      vertical: 30,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    backgroundColor: Colors.indigo[700],
+                  ),
+                  child: const Text(
+                    'Crear Cuenta',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -78,14 +78,79 @@ class Parqueo {
             <Piso>[]; // Inicializa con una lista vacía si no se proporciona
 }
 
+class DataReservationSearch {
+  DocumentReference idParqueo;
+  String? piso;
+  String? parqueo;
+  String? fila;
+  bool? tieneCobertura;
+  String? plaza;
+  String? tipoVehiculo;
+  Timestamp? fechaInicio;
+  Timestamp? fechaFin;
+  double? total;
+
+  DataReservationSearch(
+      {required this.idParqueo,
+      this.parqueo,
+      this.piso,
+      this.fila,
+      this.tieneCobertura,
+      this.plaza,
+      this.tipoVehiculo,
+      this.fechaFin,
+      this.fechaInicio,
+      this.total});
+}
+
+class ParkingReservation {
+  String piso;
+  String parqueo;
+  String fila;
+  bool tieneCobertura;
+  String plaza;
+  final String tipoVehiculo; // BOOL
 
 
+  ParkingReservation({
+      required this.parqueo,
+      required this.piso,
+      required this.fila,
+      required this.tieneCobertura,
+      required this.plaza,
+      required this.tipoVehiculo
+      });
+}
+class VehicleReservation {
+  String color;
+  String placa;
+  String marca;
+  String tipo;
+  final String modelo; // BOOL
 
 
+  VehicleReservation({
+      required this.color,
+      required this.placa,
+      required this.marca,
+      required this.tipo,
+      required this.modelo
+      });
+}
+class CustomerReservation {
+  String nombre;
+  String apellidos;
+  String celular;
+  String correo;
 
 
-
-
+  CustomerReservation({
+      required this.nombre,
+      required this.apellidos,
+      required this.celular,
+      required this.correo,
+      });
+}
 
 
 

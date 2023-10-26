@@ -1,20 +1,16 @@
+import 'dart:developer';
+
+import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-class Piso {
-  final String nombre;
-  final String descripcion;
-  final String idParqueo;
-
-  Piso(this.nombre, this.descripcion, this.idParqueo);
-}
 
 class CreatePisoScreen extends StatelessWidget {
   static const routeName = '/vista-piso';
 
-  final String idParqueo;
+  final DocumentReference idParqueo;
 
-  CreatePisoScreen({required this.idParqueo});
+  const CreatePisoScreen({super.key, required this.idParqueo});
 
   @override
   Widget build(BuildContext context) {
@@ -24,15 +20,17 @@ class CreatePisoScreen extends StatelessWidget {
           title: const Text('Formulario de Piso'),
           backgroundColor: const Color.fromARGB(255, 5, 126, 225),
         ),
-        body: PisoListScreen(idParqueo: idParqueo,),
+        body: PisoListScreen(
+          idParqueo: idParqueo,
+        ),
       ),
     );
   }
 }
 
 class PisoListScreen extends StatefulWidget {
-  final String idParqueo;
-  
+  final DocumentReference idParqueo;
+
   PisoListScreen({required this.idParqueo});
 
   @override
@@ -47,39 +45,104 @@ class _PisoListScreenState extends State<PisoListScreen> {
         title: const Text('Lista de Pisos'),
         backgroundColor: Colors.blue,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // ... otros widgets ...
+      body: StreamBuilder(
+        stream: getPisos(widget.idParqueo),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AgregarPisoScreen(),
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+
+          // Obtén la lista de plazas
+          List<Piso> pisos =
+              snapshot.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+            return Piso(
+                idPiso: document.reference,
+                nombre: data['nombre'],
+                descripcion: data['descripcion']);
+          }).toList();
+          return ListView.builder(
+            itemCount: pisos.length,
+            itemBuilder: (context, index) {
+              final piso = pisos[index];
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          CreatePisoScreen(idParqueo: widget.idParqueo),
+                    ),
+                  );
+                  // Implementa aquí la lógica que se realizará al hacer clic en el elemento.
+                  // Por ejemplo, puedes abrir una pantalla de detalles de la plaza.
+                },
+                child: Card(
+                  elevation: 3.0,
+                  margin: const EdgeInsets.symmetric(
+                      vertical: 8.0, horizontal: 16.0),
+                  child: ListTile(
+                    title: Text(
+                      piso.nombre,
+                      style: const TextStyle(
+                          fontSize: 18.0, fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      piso.descripcion,
+                      style: const TextStyle(fontSize: 16.0),
+                    ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.car_repair, color: Colors.blue),
+                      onPressed: () {
+                        // DataReservationSearch dataSearch = DataReservationSearch(idParqueo: parqueo.idParqueo);
+                        // // Implementa aquí la lógica para abrir la pantalla de edición.
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => MostrarDatosParqueoScreen(dataSearch: dataSearch)
+                        //   ),
+                        // );
+                      },
+                    ),
                   ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
-              ),
-              child: const Text('Agregar Piso'),
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AgregarPisoScreen(idParqueo: widget.idParqueo),
             ),
-          ],
-        ),
+          );
+        },
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.add),
       ),
     );
   }
 }
 
 class AgregarPisoScreen extends StatefulWidget {
+  final DocumentReference idParqueo;
+  const AgregarPisoScreen({super.key, required this.idParqueo});
+
   @override
-  _AgregarPisoScreenState createState() => _AgregarPisoScreenState();
+  AgregarPisoScreenState createState() => AgregarPisoScreenState();
 }
 
-class _AgregarPisoScreenState extends State<AgregarPisoScreen> {
+class AgregarPisoScreenState extends State<AgregarPisoScreen> {
   TextEditingController nombreController = TextEditingController();
   TextEditingController descripcionController = TextEditingController();
 
@@ -103,7 +166,6 @@ class _AgregarPisoScreenState extends State<AgregarPisoScreen> {
               ),
             ),
             const SizedBox(height: 20.0),
-
             const Text("Descripción del Piso"),
             TextFormField(
               controller: descripcionController,
@@ -113,23 +175,21 @@ class _AgregarPisoScreenState extends State<AgregarPisoScreen> {
               ),
             ),
             const SizedBox(height: 20.0),
-
-            
-
             ElevatedButton(
-              onPressed: () async{
+              onPressed: () async {
                 // Aquí puedes implementar la lógica para agregar un nuevo piso
                 // utilizando los datos ingresados en los controladores.
                 Map<String, dynamic> data = {
                   'nombre': nombreController.text,
                   'descripcion': descripcionController.text
-
                 };
 
-                await(agregarPiso(data, 'ID-PARQUEO-3'));
+                await (agregarPiso(data, widget.idParqueo));
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
+                backgroundColor: Colors.blue,
               ),
               child: const Text('Agregar Piso'),
             ),
@@ -140,22 +200,33 @@ class _AgregarPisoScreenState extends State<AgregarPisoScreen> {
   }
 }
 
+Stream<QuerySnapshot> getPisos(DocumentReference parqueoRef) {
+  try {
+    final User? user = FirebaseAuth.instance.currentUser;
 
-Future<void> agregarPiso(Map<String, dynamic> datos, String idParqueo) async {
+    if (user != null) {
+      CollectionReference pisosCollection = parqueoRef.collection('pisos');
+      return pisosCollection.snapshots();
+      // Filtra los documentos donde el campo 'IdDuenio' sea igual al user.uid
+    } else {
+      // Si el usuario no ha iniciado sesión, aún puedes devolver un Stream vacío o manejarlo de otra manera.
+      return const Stream<QuerySnapshot>.empty();
+    }
+  } catch (e) {
+    log('Error al obtener el Stream de parqueos: $e');
+    rethrow;
+  }
+}
 
+Future<void> agregarPiso(
+    Map<String, dynamic> datos, DocumentReference idParqueo) async {
   try {
     // Obtén una referencia a la colección 'pisos' dentro de un parqueo específico
-    CollectionReference pisosCollection = FirebaseFirestore.instance
-        .collection('parqueo') // Cambia 'parqueo' al nombre de tu colección de parqueos
-        .doc(idParqueo) // Cambia 'ID-DEL-PARQUEO' al ID del parqueo específico
-        .collection('pisos');
+    CollectionReference pisosCollection = idParqueo.collection('pisos');
 
     // Agrega un nuevo documento a la colección 'pisos' con los datos proporcionados
     await pisosCollection.add(datos);
   } catch (e) {
-    print('Error al agregar el piso: $e');
+    log('Error al agregar el piso: $e');
   }
-
 }
-
-

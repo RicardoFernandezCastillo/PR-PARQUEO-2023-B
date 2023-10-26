@@ -1,4 +1,7 @@
-import 'package:bluehpark/models/Parking.dart';
+import 'dart:developer';
+import 'package:bluehpark/models/to_use/parking.dart';
+import 'package:bluehpark/pages/client/reservation/nearby_parking.dart';
+import 'package:bluehpark/pages/client/reservation/vistaParqueoDisponible.dart';
 import 'package:bluehpark/services/fb_service_map.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +37,7 @@ class _MapClientState extends State<MapClient> {
         mapController.move(userLocation, 16.0);
       });
     } catch (e) {
-      print('Error obteniendo la ubicación: $e');
+      log('Error obteniendo la ubicación: $e');
     }
   }
 
@@ -63,13 +66,13 @@ class _MapClientState extends State<MapClient> {
             return Text('Error: ${snapshot.error}');
           }
 
-          List<Parking> parkings =
+          List<Parqueo> parkings =
               snapshot.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-            return Parking(
-                idParking: document.id,
-                name: data['nombre'],
-                description: data['descripcion'],
+            return Parqueo(
+                idParqueo: document.reference,
+                nombre: data['nombre'],
+                descripcion: data['descripcion'],
                 direccion: data['direccion'],
                 ubicacion: data['ubicacion'],
                 tieneCobertura: data['tieneCobertura'],
@@ -127,13 +130,15 @@ class _MapClientState extends State<MapClient> {
                             context: context,
                             builder: (context) {
                               return ItenDetail(
-                                  parking.name,
-                                  parking.description,
+                                  parking.idParqueo,
+                                  parking.nombre,
+                                  parking.descripcion,
                                   parking.direccion,
                                   parking.horaApertura,
                                   parking.horaCierre,
                                   parking.tieneCobertura,
-                                  parking.vehiculosPermitidos);
+                                  parking.vehiculosPermitidos,
+                                  context);
                             },
                           );
                         },
@@ -181,13 +186,15 @@ class _MapClientState extends State<MapClient> {
 }
 
 Widget ItenDetail(
+    DocumentReference idParkingDoc,
     String name,
     String description,
     String direccion,
     Timestamp horaApertura,
     Timestamp horaCierre,
     bool tieneCobertura,
-    Map<String, dynamic> vehiculosPermitidos) {
+    Map<String, dynamic> vehiculosPermitidos,
+    BuildContext context) {
   const style = TextStyle(fontSize: 16);
   DateFormat formatter = DateFormat('HH:mm');
   return Padding(
@@ -304,7 +311,17 @@ Widget ItenDetail(
           ),
           MaterialButton(
             padding: EdgeInsets.zero,
-            onPressed: () {},
+            onPressed: () {
+              if (!context.mounted) return;
+              DataReservationSearch dataSearch =
+                  DataReservationSearch(idParqueo: idParkingDoc);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MostrarDatosParqueoScreen(
+                        dataSearch: dataSearch)), //),
+              );
+            },
             color: Colors.blue,
             elevation: 6,
             child: const Text(

@@ -259,7 +259,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                  WelcomeScreen(),
+                                  const WelcomeScreen(),
                               ),
                             );
                           } catch (e) {
