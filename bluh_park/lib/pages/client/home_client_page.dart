@@ -1,3 +1,4 @@
+import 'package:bluehpark/pages/client/reservation/nearby_parking.dart';
 import 'package:bluehpark/pages/map/map_client.dart';
 import 'package:flutter/material.dart';
 
@@ -64,6 +65,11 @@ class HomeClient extends StatelessWidget {
                           IconButton(
                             icon: const Icon(Icons.file_open_rounded),
                             onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const SelectParkingScreen()));
+                              //SelectParkingScreen
                               // Agrega la lógica para el botón 'Mis parqueos' aquí
                             },
                             iconSize: 50,
@@ -122,12 +128,11 @@ class HomeClient extends StatelessWidget {
                           size: 40,
                           color: Colors.green,
                         ),
-                        ListTile(
-                          title: Text(
+                      Text(
                             "Buscar Parqueos",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ),
+                        SizedBox(height: 10),
                       ],
                     ),
                   ),

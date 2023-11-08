@@ -1,6 +1,9 @@
 import 'package:bluehpark/models/Parking.dart';
+import 'package:bluehpark/models/auth/auth_service.dart';
+import 'package:bluehpark/pages/owner/parking/owner_parkings.dart';
 import 'package:bluehpark/services/fb_service_map.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -15,7 +18,6 @@ class MapOwner extends StatefulWidget {
 
 class _MapOwnerState extends State<MapOwner> {
   final MapController mapController = MapController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +33,7 @@ class _MapOwnerState extends State<MapOwner> {
         backgroundColor: Colors.blue,
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: getParkingsByOwner('adjofsdfondsd'),
+        stream: getParkingsByOwner(FirebaseAuth.instance.currentUser!.uid), //OJO ---------------------------------------
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -100,7 +102,7 @@ class _MapOwnerState extends State<MapOwner> {
                                 parking.horaApertura,
                                 parking.horaCierre,
                                 parking.tieneCobertura,
-                                parking.vehiculosPermitidos);
+                                parking.vehiculosPermitidos,context);
                           },
                         );
                       },
@@ -118,7 +120,7 @@ class _MapOwnerState extends State<MapOwner> {
           FloatingActionButton(
             onPressed: () {
               mapController.move(
-                  mapController.center, mapController.zoom + 1.0);
+                  mapController.camera.center, mapController.camera.zoom + 1.0);
               // Hace zoom en el mapa
             },
             child: const Icon(Icons.add),
@@ -127,7 +129,7 @@ class _MapOwnerState extends State<MapOwner> {
           FloatingActionButton(
             onPressed: () {
               mapController.move(
-                  mapController.center, mapController.zoom - 1.0);
+                  mapController.camera.center, mapController.camera.zoom - 1.0);
               // Hace zoom out en el mapa
             },
             child: const Icon(Icons.remove),
@@ -145,7 +147,7 @@ Widget ItenDetail(
     Timestamp horaApertura,
     Timestamp horaCierre,
     bool tieneCobertura,
-    Map<String, dynamic> vehiculosPermitidos) {
+    Map<String, dynamic> vehiculosPermitidos, BuildContext context,) {
   const style = TextStyle(fontSize: 16);
   DateFormat formatter = DateFormat('HH:mm');
   return Padding(
@@ -254,6 +256,23 @@ Widget ItenDetail(
                         Icon(Icons.motorcycle, color: Colors.blueGrey),
                         Icon(Icons.train, color: Colors.blueGrey)
                       ],
+                    ),
+                      MaterialButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const OwnerParkingsScreen()), //),
+                        );
+                      },
+                      color: Colors.blue,
+                      elevation: 6,
+                      child: const Text(
+                        'Reservar',
+                        style:
+                            TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
                     )
                   ],
                 ))

@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:bluehpark/models/to_use/parking.dart';
-import 'package:bluehpark/pages/client/reservation/nearby_parking.dart';
 import 'package:bluehpark/pages/client/reservation/vistaParqueoDisponible.dart';
 import 'package:bluehpark/services/fb_service_map.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

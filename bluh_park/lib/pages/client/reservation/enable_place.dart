@@ -2,12 +2,14 @@ import 'dart:developer';
 import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:bluehpark/pages/client/reservation/reservationRegister.dart';
+import 'package:bluehpark/utilities/toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class SelectSpaceScreen extends StatelessWidget {
+  final DataReservationSearch dataSearch;
   static const routeName = '/enable-parking';
-  const SelectSpaceScreen({super.key});
+  const SelectSpaceScreen({super.key, required this.dataSearch});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,7 +17,9 @@ class SelectSpaceScreen extends StatelessWidget {
         appBar: AppBar(
             title: const Text('Plazas Disponibles'),
             backgroundColor: const Color.fromARGB(255, 5, 126, 225)),
-        //body: PlazaListScreen(),
+        body: PlazaListScreen(
+          dataSearch: dataSearch,
+        ),
       ),
     );
   }
@@ -46,11 +50,9 @@ class PlazaListScreenState extends State<PlazaListScreen> {
             return Text('Error: ${snapshot.error}');
           }
 
-          // Obtén la lista de plazas
           List<Plaza> plazas =
               snapshot.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data = document.data()
-                as Map<String, dynamic>; // Obtener el ID del documento
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
             return Plaza(
               idPlaza: document.reference,
               nombre: data['nombre'],
@@ -58,6 +60,26 @@ class PlazaListScreenState extends State<PlazaListScreen> {
               estado: data['estado'],
             );
           }).toList();
+
+          if (plazas.isEmpty) {
+            //Toast.show(context, "${widget.dataSearch.tieneCobertura} - ${widget.dataSearch.tipoVehiculo}");
+            // No se encontraron plazas disponibles
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('No se encontró una plaza disponible'),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Volver a realizar la búsqueda
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Volver a realizar la búsqueda'),
+                  ),
+                ],
+              ),
+            );
+          }
 
           return ListView.builder(
             itemCount: plazas.length,
@@ -67,12 +89,12 @@ class PlazaListScreenState extends State<PlazaListScreen> {
                 onTap: () {
                   DataReservationSearch dataSearch = widget.dataSearch;
                   dataSearch.plaza = plaza.nombre;
-                  //ReservaRegisterScreen
+                  dataSearch.idPlaza = plaza.idPlaza;
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ReservaRegisterScreen(
-                            dataSearch: dataSearch)), //),
+                        builder: (context) =>
+                            ReservaRegisterScreen(dataSearch: dataSearch)),
                   );
                 },
                 child: Card(
@@ -94,12 +116,12 @@ class PlazaListScreenState extends State<PlazaListScreen> {
                       onPressed: () {
                         DataReservationSearch dataSearch = widget.dataSearch;
                         dataSearch.plaza = plaza.nombre;
-                        //ReservaRegisterScreen
+                        dataSearch.idPlaza = plaza.idPlaza;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => ReservaRegisterScreen(
-                                  dataSearch: dataSearch)), //),
+                                  dataSearch: dataSearch)),
                         );
                       },
                     ),
@@ -309,7 +331,7 @@ Stream<QuerySnapshot> getSpaces(DataReservationSearch dataSearch) async* {
           filaDocument.data() as Map<String, dynamic>;
 
       final Query plazaQuery = dataSearch.idParqueo
-          .collection(SubCollectionParking.filas)
+          .collection(SubCollectionParking.pisos)
           .doc(pisoDocument.id)
           .collection(SubCollectionParking.filas)
           .doc(filaDocument.id)

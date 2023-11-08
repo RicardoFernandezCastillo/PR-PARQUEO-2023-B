@@ -24,6 +24,9 @@ class _MenuOwnerState extends State<MenuOwner> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // theme: ThemeData(
+      //       useMaterial3: true
+      //     ),
       debugShowCheckedModeBanner: false,
       title: 'Bluh Park',
       home: Scaffold(

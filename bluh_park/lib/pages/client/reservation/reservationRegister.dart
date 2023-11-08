@@ -1,6 +1,11 @@
 import 'dart:developer';
 
+import 'package:bluehpark/models/coleccion/collection_field.dart';
+import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/models/to_use/parking.dart';
+import 'package:bluehpark/models/user.dart';
+import 'package:bluehpark/pages/client/home_client_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -25,9 +30,13 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
   TextEditingController colorController = TextEditingController();
   TextEditingController modeloController = TextEditingController();
   TextEditingController estadoController = TextEditingController();
+  TextEditingController fechaInicioController = TextEditingController();
+  TextEditingController fechaFinController = TextEditingController();
+
   DateTime? reservationDateIn, reservationDateOut;
   bool radioValue = false;
   List<bool> checkboxValues = [false, false, false];
+  String typeVehicle = "";
 
   @override
   void initState() {
@@ -46,48 +55,58 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
 
   Future<void> getDataReservation() async {
     try {
-      DocumentSnapshot reservaDocument = await FirebaseFirestore.instance
-          .collection('reserva')
-          .doc(
-              'tHHhTWGuAVdhjuIN5u8k') // Reemplaza 'ID_DEL_DOCUMENTO' por el ID real del documento que deseas recuperar
-          .get();
+      /*DocumentSnapshot<Map<String, dynamic>> parqueoDoc =
+          await widget.dataSearch.idParqueo.get()
+              as DocumentSnapshot<Map<String, dynamic>>;*/
 
-      DocumentSnapshot ticketDocument = await FirebaseFirestore.instance
-          .collection('ticket')
-          .doc(
-              'sFT1XDlqXxsOAfLudVHw') // Reemplaza 'ID_DEL_DOCUMENTO' por el ID real del documento que deseas recuperar
-          .get();
+      DocumentSnapshot plazaDoc = await widget.dataSearch.idPlaza!.get();
 
-      Map<String, dynamic> dataReserve =
-          reservaDocument.data() as Map<String, dynamic>;
+      Map<String, dynamic> dataPlace = plazaDoc.data() as Map<String, dynamic>;
 
-      Map<String, dynamic> dataTicket =
-          ticketDocument.data() as Map<String, dynamic>;
+      DocumentSnapshot filaDoc =
+          await widget.dataSearch.idPlaza!.parent.parent!.get();
 
-      setState(() {
-        nombreParqueo.text = 'Parqueo${widget.dataSearch.parqueo!}';
+      Map<String, dynamic> dataFila = filaDoc.data() as Map<String, dynamic>;
 
-        pisoController.text = dataReserve['parqueo']['piso'];
-        filaController.text = dataReserve['parqueo']['fila'];
-        plazaController.text = widget.dataSearch.plaza!;
-        if (widget.dataSearch.tipoVehiculo == "Moto") {
-          checkboxValues[0] = true;
-        } else if (widget.dataSearch.tipoVehiculo == "Automóvil") {
-          checkboxValues[1] = true;
-        } else if (widget.dataSearch.tipoVehiculo == "Otro") {
-          checkboxValues[2] = true;
-        }
-        estadoController.text = dataReserve['estado'];
-        // placaController.text = dataReserve['vehiculo']['placa'];
-        // marcaController.text = dataReserve['vehiculo']['marca'];
-        // colorController.text = dataReserve['vehiculo']['color'];
-        // modeloController.text = dataReserve['vehiculo']['modelo'];
-        radioValue = widget.dataSearch.tieneCobertura!;
-        Timestamp timestampDateOut = widget.dataSearch.fechaFin!;
-        reservationDateOut = timestampDateOut.toDate();
-        Timestamp timestampDateIn = widget.dataSearch.fechaInicio!;
-        reservationDateIn = timestampDateIn.toDate();
-      });
+      DocumentSnapshot pisoDoc =
+          await widget.dataSearch.idPlaza!.parent.parent!.parent.parent!.get();
+
+      Map<String, dynamic> dataPiso = pisoDoc.data() as Map<String, dynamic>;
+
+      DocumentSnapshot parkingDoc = await widget.dataSearch.idParqueo.get();
+
+      Map<String, dynamic> dataParking =
+          parkingDoc.data() as Map<String, dynamic>;
+
+      nombreParqueo.text = dataParking['nombre'];
+
+      pisoController.text = dataPiso['nombre'];
+      filaController.text = dataFila['nombre'];
+      plazaController.text = widget.dataSearch.plaza!;
+      typeVehicle = widget.dataSearch.tipoVehiculo!;
+      if (widget.dataSearch.tipoVehiculo == "Moto") {
+        checkboxValues[0] = true;
+      } else if (widget.dataSearch.tipoVehiculo == "Automóvil") {
+        checkboxValues[1] = true;
+      } else if (widget.dataSearch.tipoVehiculo == "Otro") {
+        checkboxValues[2] = true;
+      }
+      estadoController.text = dataPlace['estado'];
+      // placaController.text = dataReserve['vehiculo']['placa'];
+      // marcaController.text = dataReserve['vehiculo']['marca'];
+      // colorController.text = dataReserve['vehiculo']['color'];
+      // modeloController.text = dataReserve['vehiculo']['modelo'];
+      radioValue = widget.dataSearch.tieneCobertura!;
+      Timestamp timestampDateOut = widget.dataSearch.fechaFin!;
+      reservationDateOut = timestampDateOut.toDate();
+      Timestamp timestampDateIn = widget.dataSearch.fechaInicio!;
+      reservationDateIn = timestampDateIn.toDate();
+      // setState(() {
+      fechaInicioController.text =
+          DateFormat('dd/MM/yyyy HH:mm a').format(reservationDateIn!);
+      fechaFinController.text =
+          DateFormat('dd/MM/yyyy HH:mm a').format(reservationDateOut!);
+      // });
     } catch (e) {
       log(e.toString());
     }
@@ -273,7 +292,7 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                             const Padding(
                               padding: EdgeInsets.all(10.0),
                               child: Text(
-                                'Vehiculos Reservado',
+                                'Vehiculo',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -287,27 +306,40 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                                 IgnorePointer(
                                   ignoring:
                                       true, // Esto hace que los Checkbox sean de solo lectura
-                                  child: Checkbox(
-                                    value: checkboxValues[0],
-                                    onChanged: null,
-                                    activeColor: Colors
-                                        .blueAccent, // Pasar null a onChanged deshabilita la interacción
+                                  child: Radio(
+                                    value: typeVehicle,
+                                    groupValue: typeVehicle,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        typeVehicle = val!;
+                                      });
+                                    },
                                   ),
                                 ),
                                 const Text('Motos'),
                                 IgnorePointer(
                                   ignoring: true,
-                                  child: Checkbox(
-                                    value: checkboxValues[1],
-                                    onChanged: null,
+                                  child: Radio(
+                                    value: typeVehicle,
+                                    groupValue: typeVehicle,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        typeVehicle = val!;
+                                      });
+                                    },
                                   ),
                                 ),
                                 const Text('Automoviles'),
                                 IgnorePointer(
                                   ignoring: true,
-                                  child: Checkbox(
-                                    value: checkboxValues[2],
-                                    onChanged: null,
+                                  child: Radio(
+                                    value: typeVehicle,
+                                    groupValue: typeVehicle,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        typeVehicle = val!;
+                                      });
+                                    },
                                   ),
                                 ),
                                 const Text(
@@ -315,39 +347,6 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                                 ),
                               ],
                             )
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        padding:
-                            const EdgeInsets.only(top: 16, left: 16, right: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: const Color.fromARGB(220, 217, 217, 217),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Estado',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 10),
-                            TextField(
-                              controller: estadoController,
-                              style: const TextStyle(fontSize: 18),
-                              decoration: const InputDecoration(
-                                contentPadding: EdgeInsets
-                                    .zero, // Elimina el relleno interior del TextField
-                                border: InputBorder
-                                    .none, // Elimina el borde predeterminado
-                                focusedBorder: InputBorder
-                                    .none, // Elimina el borde de enfoque
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -388,14 +387,6 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                                     style: const TextStyle(
                                       fontSize: 15,
                                     ),
-                                    decoration: const InputDecoration(
-                                      contentPadding: EdgeInsets
-                                          .zero, // Elimina el relleno interior del TextField
-                                      border: InputBorder
-                                          .none, // Elimina el borde predeterminado
-                                      focusedBorder: InputBorder
-                                          .none, // Elimina el borde de enfoque
-                                    ),
                                   ),
                                 ),
                                 const Text(
@@ -410,14 +401,6 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                                     controller: marcaController,
                                     style: const TextStyle(
                                       fontSize: 15,
-                                    ),
-                                    decoration: const InputDecoration(
-                                      contentPadding: EdgeInsets
-                                          .zero, // Elimina el relleno interior del TextField
-                                      border: InputBorder
-                                          .none, // Elimina el borde predeterminado
-                                      focusedBorder: InputBorder
-                                          .none, // Elimina el borde de enfoque
                                     ),
                                   ),
                                 ),
@@ -442,14 +425,6 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                                     style: const TextStyle(
                                       fontSize: 15,
                                     ),
-                                    decoration: const InputDecoration(
-                                      contentPadding: EdgeInsets
-                                          .zero, // Elimina el relleno interior del TextField
-                                      border: InputBorder
-                                          .none, // Elimina el borde predeterminado
-                                      focusedBorder: InputBorder
-                                          .none, // Elimina el borde de enfoque
-                                    ),
                                   ),
                                 ),
                                 const Text(
@@ -464,14 +439,6 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                                     controller: modeloController,
                                     style: const TextStyle(
                                       fontSize: 15,
-                                    ),
-                                    decoration: const InputDecoration(
-                                      contentPadding: EdgeInsets
-                                          .zero, // Elimina el relleno interior del TextField
-                                      border: InputBorder
-                                          .none, // Elimina el borde predeterminado
-                                      focusedBorder: InputBorder
-                                          .none, // Elimina el borde de enfoque
                                     ),
                                   ),
                                 ),
@@ -549,23 +516,21 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                                 style: TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 25),
-                            InkWell(
-                              child: Row(
-                                children: [
-                                  const Icon(Icons
-                                      .calendar_today), // Ícono de calendario
-                                  const SizedBox(
-                                      width:
-                                          8), // Espacio entre el ícono y el texto
-                                  Text(
-                                    reservationDateIn != null
-                                        ? DateFormat('dd/MM/yyyy HH:mm: a')
-                                            .format(reservationDateIn!)
-                                        : 'Selecciona Fecha y Hora',
-                                  ),
-                                ],
+                            TextField(
+                              readOnly: true,
+                              controller: fechaInicioController,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Urbanist',
                               ),
-                            )
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.zero,
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -584,23 +549,21 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                                 style: TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 25),
-                            InkWell(
-                              child: Row(
-                                children: [
-                                  const Icon(Icons
-                                      .calendar_today), // Ícono de calendario
-                                  const SizedBox(
-                                      width:
-                                          8), // Espacio entre el ícono y el texto
-                                  Text(
-                                    reservationDateOut != null
-                                        ? DateFormat('dd/MM/yyyy HH:mm a')
-                                            .format(reservationDateOut!)
-                                        : 'Selecciona Fecha y Hora',
-                                  ),
-                                ],
+                            TextField(
+                              readOnly: true,
+                              controller: fechaFinController,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Urbanist',
                               ),
-                            )
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.zero,
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -625,8 +588,46 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                             ' Registrar',
                             style: TextStyle(fontSize: 20),
                           ),
-                          onPressed: () {
-                            //Navigator.pop(context);
+                          onPressed: () async {
+                            final User? user = FirebaseAuth.instance.currentUser;
+                            DocumentSnapshot parqueoDoc = FirebaseFirestore.instance.collection(Collection.reservas).doc(user!.uid).get() as DocumentSnapshot<Object?>;
+                            Map<String, dynamic> userData = parqueoDoc.data() as Map<String, dynamic>;
+                            
+                            Map<String, dynamic> cliente = {
+                              'nombre': userData[UsersCollection.nombre],
+                              'apellidos': userData[UsersCollection.apellidos],
+                              'telefono': userData[UsersCollection.telefono],
+                            };
+                            Map<String, dynamic> vehiculo = {
+                              'tipo': typeVehicle,
+                              'placaVehiculo': placaController.text,
+                              'marcaVehiculo': marcaController.text,
+                              'colorVehiculo': colorController.text,
+                              'modeloVehiculo': modeloController.text,
+                            };
+                            Map<String, dynamic> parqueo = {
+                              'nombre': nombreParqueo,
+                              'piso': pisoController.text,
+                              'fila': filaController.text,
+                              'cuentaCobertura': widget.dataSearch.tieneCobertura
+                            };
+
+                            Map<String, dynamic> data = {
+                              'cliente': cliente,
+                              'vehiculo': vehiculo,
+                              'parqueo': parqueo,
+                              'estado': typeVehicle,
+                              'fechaLlegada': widget.dataSearch.fechaInicio,
+                              'fechaSalida': widget.dataSearch.fechaFin,
+                              'total': widget.dataSearch.total,
+                            };
+                            agregarReserva(datos: data);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const HomeClient()),
+                            );
                           },
                         ),
                       )
@@ -640,4 +641,16 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
       ),
     );
   }
+
+  Future<void> agregarReserva({required Map<String, dynamic> datos}) async {
+
+    await FirebaseFirestore.instance.collection(Collection.reservas).add(datos);
+  }
 }
+
+/*
+
+
+
+
+ */

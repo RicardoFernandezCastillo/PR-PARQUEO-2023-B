@@ -1,7 +1,5 @@
 import 'dart:developer';
-import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/models/to_use/parking.dart';
-import 'package:bluehpark/pages/client/reservation/reservationRegister.dart';
 import 'package:bluehpark/pages/owner/floor/vistaPiso.dart';
 import 'package:bluehpark/pages/owner/parking/registroParqueo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -104,6 +102,7 @@ class PlazaListScreenState extends State<PlazaListScreen> {
                     trailing: IconButton(
                       icon: const Icon(Icons.car_repair, color: Colors.blue),
                       onPressed: () {
+                        //VEMTANA DE EDITAR PARQUEO
                         // DataReservationSearch dataSearch = DataReservationSearch(idParqueo: parqueo.idParqueo);
                         // // Implementa aquí la lógica para abrir la pantalla de edición.
                         // Navigator.push(

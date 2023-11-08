@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
   static const routeName = '/welcome-screen';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       backgroundColor: Colors.white,
       body: Container(
         padding: const EdgeInsets.all(10),
@@ -54,8 +54,12 @@ class WelcomeScreen extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () => {
-                    Navigator.of(context)
-                            .pushNamed(LoginPage.routeName)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginPage(),
+                      ),
+                    )
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
@@ -97,6 +101,7 @@ class WelcomeScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     backgroundColor: Colors.indigo[700],
+                    
                   ),
                   child: const Text(
                     'Crear Cuenta',

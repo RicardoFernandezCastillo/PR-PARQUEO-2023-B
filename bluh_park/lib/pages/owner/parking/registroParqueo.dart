@@ -1,4 +1,3 @@
-// ignore: file_names
 import 'dart:developer';
 import 'dart:io' show File;
 import 'package:bluehpark/utilities/progressbar.dart';
@@ -34,7 +33,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
 
   TextEditingController longitudController = TextEditingController();
 
-  bool? tieneCoberturaController;
+  bool tieneCobertura = true;
 
   TextEditingController descripcionController = TextEditingController();
 
@@ -55,6 +54,11 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
   TextEditingController otroHoraController = TextEditingController();
   TextEditingController otroDiaController = TextEditingController();
 
+
+  bool autoSelected = false;
+  bool motoSelected = false;
+  bool mixtoSelected = false;
+
   File? _image;
 
   Future<void> _getImageFromGallery() async {
@@ -71,17 +75,6 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
   }
 
   Future<void> _selectDateAndTimeFinal(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-      helpText: 'Seleccione una fecha',
-      context: context,
-      initialDate:
-          selectedDate[0] ?? DateTime.now().add(const Duration(hours: 1)),
-      firstDate:
-          selectedDate[0] ?? DateTime.now().add(const Duration(hours: 1)),
-      lastDate: selectedDate[0]?.add(const Duration(days: 20)) ??
-          DateTime.now().add(const Duration(days: 20)),
-    );
-    if (pickedDate != null) {
       // ignore: use_build_context_synchronously
       final TimeOfDay? pickedTime = await showTimePicker(
           helpText: 'Seleccione la hora',
@@ -92,9 +85,9 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
         if (pickedTime.hour > 6 && pickedTime.hour < 22) {
           setState(() {
             selectedDate[1] = DateTime(
-              pickedDate.year,
-              pickedDate.month,
-              pickedDate.day,
+              DateTime.now().year,
+              DateTime.now().month,
+              DateTime.now().day,
               pickedTime.hour,
               pickedTime.minute,
             );
@@ -105,16 +98,9 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
           Toast.show(context, 'Horario no disponible');
         }
       }
-    }
   }
 
   Future<void> _selectDateAndTimeInitial(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
-        context: context,
-        initialDate: selectedDate[0] ?? DateTime.now(),
-        firstDate: DateTime.now(),
-        lastDate: DateTime.now().add(const Duration(days: 20)));
-    if (pickedDate != null) {
       // ignore: use_build_context_synchronously
       final TimeOfDay? pickedTime = await showTimePicker(
         helpText: 'Seleccione la hora',
@@ -124,26 +110,17 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
         ),
       );
       if (pickedTime != null) {
-        if ((pickedTime.hour > 6 && pickedTime.hour < 22)) {
-          if ((pickedTime.minute == 0 && pickedTime.hour == 22 - 1) ||
-              (pickedTime.hour != 22 - 1)) {
-            setState(() {
-              selectedDate[0] = DateTime(
-                pickedDate.year,
-                pickedDate.month,
-                pickedDate.day,
-                pickedTime.hour,
-                pickedTime.minute,
-              );
-              selectedTime[0] = pickedTime;
-            });
-          }
-        } else {
-          if (!context.mounted) return;
-          Toast.show(context, 'Horario no disponible');
-        }
+        setState(() {
+          selectedDate[0] = DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          selectedTime[0] = pickedTime;
+        });
       }
-    }
   }
 
   @override
@@ -192,7 +169,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       const Text(
-                        "1. Nombre del Parqueo",
+                        "Nombre del Parqueo",
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
@@ -204,9 +181,11 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                         // ignore: body_might_complete_normally_nullable
                         validator: (value) {
                           if (value!.isEmpty) {
-                            return 'No pueden ser vacio estos campos';
+                            return 'Este campo no puede estar vacío';
                           }
                         },
+                        maxLength: 30,
+                        
                         decoration: InputDecoration(
                           hintText: 'Ingrese el nombre del Parqueo',
                           hintStyle: const TextStyle(
@@ -222,7 +201,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        '2. Foto del parqueo',
+                        'Imagen del parqueo',
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
@@ -288,7 +267,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        "3. Dirección del Parqueo",
+                        "Dirección del Parqueo",
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
@@ -303,6 +282,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           return null;
                         },
                         controller: direccionController,
+                        keyboardType: TextInputType.streetAddress,
                         decoration: InputDecoration(
                           hintText: 'Ingrese la direccion del Parqueo',
                           hintStyle: const TextStyle(
@@ -320,7 +300,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       Row(
                         children: [
                           const Text(
-                            "4. Ubicacion",
+                            "Ubicación",
                             style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 20,
@@ -344,9 +324,6 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                                           lati = pickedData.latitude;
                                           long = pickedData.longitude;
                                         });
-
-                                        print(pickedData.latitude);
-                                        print(pickedData.longitude);
                                         Navigator.pop(context);
                                       },
                                     );
@@ -367,7 +344,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        "5. Cuenta con cubierta",
+                        "Cuenta con cubierta",
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
@@ -377,10 +354,10 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                         children: [
                           const Text("No"),
                           Switch(
-                            value: vehiculoSeleccionado == "Sí",
+                            value: tieneCobertura,
                             onChanged: (value) {
                               setState(() {
-                                vehiculoSeleccionado = value ? "Sí" : "No";
+                                tieneCobertura = value ?  true : false;
                               });
                             },
                           ),
@@ -389,7 +366,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        "6. Descripción del Parqueo",
+                        "Descripción del Parqueo",
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
@@ -397,12 +374,6 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'campo obligatorio';
-                          }
-                          return null;
-                        },
                         maxLines: 4,
                         controller: descripcionController,
                         decoration: InputDecoration(
@@ -410,7 +381,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                             vertical: 10.0,
                             horizontal: 10.0,
                           ), // Ajusta estos valores según tus necesidades
-                          hintText: 'Ingrese la descripcion del parqueo',
+                          hintText: 'Opcional',
                           hintStyle: const TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 18,
@@ -424,7 +395,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        "7. Vehículos permitidos",
+                        "Vehículos permitidos",
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
@@ -434,41 +405,38 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Radio(
-                            value: "Autos",
-                            groupValue: vehiculoSeleccionado,
+                          Checkbox(
+                            value: autoSelected,
                             onChanged: (value) {
                               setState(() {
-                                vehiculoSeleccionado = value;
+                                autoSelected = value!;
                               });
                             },
                           ),
                           const Text("Autos"),
-                          Radio(
-                            value: "Motos",
-                            groupValue: vehiculoSeleccionado,
+                          Checkbox(
+                            value: motoSelected,
                             onChanged: (value) {
                               setState(() {
-                                vehiculoSeleccionado = value;
+                                motoSelected = value!;
                               });
                             },
                           ),
                           const Text("Motos"),
-                          Radio(
-                            value: "Mixto",
-                            groupValue: vehiculoSeleccionado,
+                          Checkbox(
+                            value: mixtoSelected,
                             onChanged: (value) {
                               setState(() {
-                                vehiculoSeleccionado = value;
+                                mixtoSelected = value!;
                               });
                             },
                           ),
-                          const Text("Mixto"),
+                          const Text("Otros"),
                         ],
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        "8. NIT del Propietario",
+                        "NIT del Propietario",
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
@@ -477,8 +445,9 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: nitController,
+                        keyboardType: TextInputType.number,                        
                         decoration: InputDecoration(
-                          hintText: 'Ingrese el NIT del propietario',
+                          hintText: 'Ingrese el NIT',
                           hintStyle: const TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 18,
@@ -492,13 +461,14 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        "9. Tarifas",
+                        "Tarifas",
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
                         ),
                       ),
                       const SizedBox(height: 10),
+                      // Tarifas para autos
                       const Padding(
                         padding: EdgeInsets.only(top: 20, left: 10),
                         child: Text(
@@ -515,11 +485,14 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           Expanded(
                             child: TextFormField(
                               controller: automovilHoraController,
+                              keyboardType: TextInputType.number,
+                              enabled: autoSelected,
+                              // Opción habilitada o deshabilitada según el valor de autoSelected
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10.0,
                                   horizontal: 10.0,
-                                ), // Ajusta estos valores según tus necesidades
+                                ),
                                 hintText: 'tarifa por hora',
                                 hintStyle: const TextStyle(
                                   fontFamily: 'Urbanist',
@@ -537,12 +510,15 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           Expanded(
                             child: TextFormField(
                               controller: automovilDiaController,
+                              keyboardType: TextInputType.number,
+                              enabled: autoSelected,
+                              // Opción habilitada o deshabilitada según el valor de autoSelected
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10.0,
                                   horizontal: 10.0,
-                                ), // Ajusta estos valores según tus necesidades
-                                hintText: 'tarifa por dia',
+                                ),
+                                hintText: 'tarifa por día',
                                 hintStyle: const TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 18,
@@ -557,7 +533,8 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+
+                      // Tarifas para motos
                       const Padding(
                         padding: EdgeInsets.only(top: 20, left: 10),
                         child: Text(
@@ -574,11 +551,14 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           Expanded(
                             child: TextFormField(
                               controller: motoHoraController,
+                              keyboardType: TextInputType.number,
+                              enabled: motoSelected,
+                              // Opción habilitada o deshabilitada según el valor de motoSelected
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10.0,
                                   horizontal: 10.0,
-                                ), // Ajusta estos valores según tus necesidades
+                                ),
                                 hintText: 'tarifa por hora',
                                 hintStyle: const TextStyle(
                                   fontFamily: 'Urbanist',
@@ -594,14 +574,17 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: TextField(
+                            child: TextFormField(
                               controller: motoDiaController,
+                              keyboardType: TextInputType.number,
+                              enabled: motoSelected,
+                              // Opción habilitada o deshabilitada según el valor de motoSelected
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10.0,
                                   horizontal: 10.0,
-                                ), // Ajusta estos valores según tus necesidades
-                                hintText: 'tarifa por dia',
+                                ),
+                                hintText: 'tarifa por día',
                                 hintStyle: const TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 18,
@@ -616,7 +599,8 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+
+                      // Tarifas para otros vehículos
                       const Padding(
                         padding: EdgeInsets.only(top: 20, left: 10),
                         child: Text(
@@ -632,18 +616,15 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                         children: [
                           Expanded(
                             child: TextFormField(
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Campo requerido';
-                                }
-                                return null;
-                              },
                               controller: otroHoraController,
+                              keyboardType: TextInputType.number,
+                              enabled: mixtoSelected,
+                              // Opción habilitada o deshabilitada según el valor de mixtoSelected
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10.0,
                                   horizontal: 10.0,
-                                ), // Ajusta estos valores según tus necesidades
+                                ),
                                 hintText: 'tarifa por hora',
                                 hintStyle: const TextStyle(
                                   fontFamily: 'Urbanist',
@@ -660,19 +641,16 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: TextFormField(
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Campo requerido';
-                                }
-                                return null;
-                              },
                               controller: otroDiaController,
+                              keyboardType: TextInputType.number,
+                              enabled: mixtoSelected,
+                              // Opción habilitada o deshabilitada según el valor de mixtoSelected
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.symmetric(
                                   vertical: 10.0,
                                   horizontal: 10.0,
-                                ), // Ajusta estos valores según tus necesidades
-                                hintText: 'tarifa por dia',
+                                ),
+                                hintText: 'tarifa por día',
                                 hintStyle: const TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 18,
@@ -687,11 +665,12 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                           ),
                         ],
                       ),
+
                       const SizedBox(
                         height: 20,
                       ),
                       const Text(
-                        '9. Horario de Apertura ',
+                        'Horario de Apertura ',
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
@@ -725,9 +704,9 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                                           8), // Espacio entre el ícono y el texto
                                   Text(
                                     selectedDate[0] != null
-                                        ? DateFormat('dd/MM/yyyy HH:mm')
+                                        ? DateFormat('HH:mm')
                                             .format(selectedDate[0]!)
-                                        : 'Selecciona Fecha y Hora',
+                                        : 'Selecciona la hora',
                                   ),
                                 ],
                               ),
@@ -737,7 +716,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        '10. Horario de Cierre ',
+                        'Horario de Cierre ',
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 20,
@@ -767,8 +746,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                                   {_selectDateAndTimeFinal(context)}
                                 else
                                   {
-                                    Toast.show(context,
-                                        'Primero seleccione la fecha inicial')
+                                    Toast.show(context,'Primero seleccione la fecha de ')
                                   }
                               },
                               child: Row(
@@ -780,9 +758,9 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                                           8), // Espacio entre el ícono y el texto
                                   Text(
                                     selectedDate[1] != null
-                                        ? DateFormat('dd/MM/yyyy HH:mm')
+                                        ? DateFormat('HH:mm')
                                             .format(selectedDate[1]!)
-                                        : 'Selecciona Fecha y Hora',
+                                        : 'Selecciona la hora',
                                   ),
                                 ],
                               ),
@@ -824,9 +802,9 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                             if (urlPath != null || urlPath != '') {
                               GeoPoint ubicacion = GeoPoint(lati,long);
                               Map<String, bool> vhp = {
-                                'Autos': true,
-                                'Motos': true,
-                                'Otros': false
+                                'Autos': autoSelected,
+                                'Motos': motoSelected,
+                                'Otros': mixtoSelected
                               };
                               Map<String, double> tarifaMoto = {
                                 'Dia': double.parse(motoDiaController.text),
@@ -848,7 +826,7 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                                 'nombre': nombreController.text,
                                 'direccion': direccionController.text,
                                 'ubicacion': ubicacion,
-                                'tieneCobertura': true,
+                                'tieneCobertura': tieneCobertura,
                                 'descripcion': descripcionController.text,
                                 'vehiculosPermitidos': vhp,
                                 'nit': nitController.text,
@@ -893,17 +871,14 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
     return '';
   }
 
-  Future<void> agregarParqueo({required Map<String, dynamic> datos}) async {
+Future<void> agregarParqueo({required Map<String, dynamic> datos}) async {
     // Obtén una referencia a la colección principal, en este caso, 'parqueos'
     var parqueos = FirebaseFirestore.instance.collection('parqueo');
     try {
       String? imageUrl = await addImageToFireStorage();
       if (imageUrl!.isNotEmpty) {
-        // Extrae el nombre de archivo de la URL de descarga
-        String fileName = imageUrl.split('/').last;
-
         // Establece el nombre de archivo en los datos
-        datos['url'] = fileName;
+        datos['url'] = imageUrl;
 
         await parqueos.add(datos);
         if (!context.mounted) return;
@@ -920,14 +895,20 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
 
   Future<String?> addImageToFireStorage() async {
     try {
+      String namefile = _image!.path.split('/').last;
       final Reference storageReference =
-          FirebaseStorage.instance.ref().child('parqueos/${_image!.path}');
+          FirebaseStorage.instance.ref().child('parqueos').child(namefile);
 
-      UploadTask task = storageReference.putFile(_image!);
-      TaskSnapshot taskSnapshot = await task.whenComplete(() => {});
+      final SettableMetadata metadata = SettableMetadata(contentType: 'image/jpeg');
+
+    UploadTask task = storageReference.putFile(
+      _image!,
+      metadata, // Establece las opciones de almacenamiento aquí
+    );      
+      TaskSnapshot taskSnapshot = await task.whenComplete(() => true);
 
       if (taskSnapshot.state == TaskState.success) {
-        String imageUrl = await storageReference.getDownloadURL();
+        String imageUrl = await taskSnapshot.ref.getDownloadURL();
         return imageUrl;
       } else {
         return '';

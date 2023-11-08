@@ -89,7 +89,7 @@ class DataReservationSearch {
   Timestamp? fechaInicio;
   Timestamp? fechaFin;
   double? total;
-
+  DocumentReference? idPlaza;
   DataReservationSearch(
       {required this.idParqueo,
       this.parqueo,
@@ -100,7 +100,8 @@ class DataReservationSearch {
       this.tipoVehiculo,
       this.fechaFin,
       this.fechaInicio,
-      this.total});
+      this.total,
+      this.idPlaza});
 }
 
 class ParkingReservation {

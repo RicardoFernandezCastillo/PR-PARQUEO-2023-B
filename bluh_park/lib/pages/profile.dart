@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:bluehpark/models/auth/auth_service.dart';
 import 'package:bluehpark/pages/login/welcome_screen.dart';
 import 'package:bluehpark/utilities/progressbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -103,20 +104,15 @@ class ProfilePage extends StatelessWidget {
                         leading: const Icon(Icons.exit_to_app),
                         title: const Text('Cerrar sesión'),
                         onTap: () async {
-                          ProgressDialog.show(context, 'Cerrando Sesión');
-                          try {
-                            FirebaseAuth.instance.signOut();
-                            ProgressDialog.hide(context);
-                            if (!context.mounted) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
-                            );
-                          } catch (e) {
-                            // Manejar errores de cierre de sesión
-                            await ProgressDialog.hide(context);
-                            log('Error al cerrar sesión: $e');
-                          }
+                          //ProgressDialog.show(context, 'Cerrando Sesión');
+                          AuthService().signOut();
+                          //ProgressDialog.hide(context);
+                          if (!context.mounted) return;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const WelcomeScreen()),
+                          );
                         },
                       ),
                     ),

@@ -1,11 +1,8 @@
-import 'package:bluehpark/models/inkwell/inkwell_data.dart';
 import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:bluehpark/pages/client/reservation/enable_place.dart';
-import 'package:bluehpark/utilities/inkwell_personalized.dart';
 import 'package:bluehpark/utilities/toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
 class ParkingSpaces extends StatefulWidget {
@@ -23,12 +20,23 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
   TextEditingController tarifaAutomovilController = TextEditingController();
   TextEditingController tarifaMotoController = TextEditingController();
   TextEditingController tarifaOtrosController = TextEditingController();
+  TextEditingController totalController = TextEditingController();
 
-  List<bool> isChecked = [false, false, false];
+  List<bool> vehiclesAllowed = [false, false, false];
+  List<double> tarifaAutomovil = [0.0, 0.0];
+  List<double> tarifaMoto = [0.0, 0.0];
+  List<double> tarifaOtro = [0.0, 0.0];
   bool radioValue = false;
+  String typeVehicle = "jeje";
   String? url;
   String direccion = '';
   String nombreParqueo = '...';
+  DateTime arriveDate = DateTime.now();
+  DateTime exitDate = DateTime.now();
+
+  DateTime startDate = DateTime.now();
+  DateTime endDate = DateTime.now();
+
   List<DateTime?> selectedDate = [null, null];
   List<TimeOfDay?> selectedTime = [null, null];
   @override
@@ -39,23 +47,87 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
 
   Future<void> loadDataParqueo() async {
     try {
-      DocumentSnapshot<Map<String, dynamic>> parqueoDoc =
+
+      /*
+            DocumentSnapshot<Map<String, dynamic>> parqueoDoc =
           await widget.dataSearch.idParqueo.get()
               as DocumentSnapshot<Map<String, dynamic>>;
 
       Map<String, dynamic> data = parqueoDoc.data() as Map<String, dynamic>;
+       */
+      DocumentSnapshot parqueoDoc =
+          await widget.dataSearch.idParqueo.get();
+
+      Map<String, dynamic> data = parqueoDoc.data() as Map<String, dynamic>;
       setState(() {
         radioValue = data['tieneCobertura'];
-        isChecked[0] = data['vehiculosPermitidos']['Motos'];
-        isChecked[1] = data['vehiculosPermitidos']['Autos'];
-        isChecked[2] = data['vehiculosPermitidos']['Otros'];
+        vehiclesAllowed[0] = data['vehiculosPermitidos']['Motos'];
+        vehiclesAllowed[1] = data['vehiculosPermitidos']['Autos'];
+        vehiclesAllowed[2] = data['vehiculosPermitidos']['Otros'];
+
+        tarifaAutomovil[0] = data['tarifaAutomovil']['Hora'].toDouble();
+        tarifaAutomovil[1] = data['tarifaAutomovil']['Dia'].toDouble();
+        tarifaAutomovilController.text = "Hora: " +
+            tarifaAutomovil[0].toString() +
+            "Bs / Dia: " +
+            tarifaAutomovil[1].toString() +
+            "Bs";
+
+        tarifaMoto[0] = data['tarifaMoto']['Hora'].toDouble();
+        tarifaMoto[1] = data['tarifaMoto']['Dia'].toDouble();
+        tarifaMotoController.text = "Hora: " +
+            tarifaMoto[0].toString() +
+            "Bs / Dia: " +
+            tarifaMoto[1].toString() +
+            "Bs";
+
+        tarifaOtro[0] = data['tarifaOtro']['Hora'].toDouble();
+        tarifaOtro[1] = data['tarifaOtro']['Dia'].toDouble();
+        tarifaOtrosController.text = "Hora: " +
+            tarifaOtro[0].toString() +
+            "Bs / Dia: " +
+            tarifaOtro[1].toString() +
+            "Bs";
+
         direccion = data['direccion'];
         nombreParqueo = data['nombre'];
+        startDate = data['horaApertura'].toDate();
+        endDate = data['horaCierre'].toDate();
       });
     } catch (e) {
       if (!context.mounted) return;
       Toast.show(context, e.toString());
     }
+  }
+
+  double getTotal() {
+    // Segunda fecha
+
+    // Restar las fechas para obtener la diferencia
+    Duration diferencia = exitDate.difference(arriveDate);
+
+    // Calcular la cantidad de días, horas y minutos
+    int dias = diferencia.inDays;
+    int horas = diferencia.inHours - (dias * 24);
+    int minutos = diferencia.inMinutes - (dias * 24 * 60) - (horas * 60);
+    double total = 0.0;
+    if (typeVehicle == 'Automóvil') {
+      total = dias * tarifaAutomovil[1] +
+          horas * tarifaAutomovil[0] +
+          (tarifaAutomovil[0] * minutos / 60) +
+          0.0;
+    } else if (typeVehicle == 'Moto') {
+      total = dias * tarifaMoto[1] +
+          horas * tarifaMoto[0] +
+          (tarifaMoto[0] * minutos / 60) +
+          0.0;
+    } else if (typeVehicle == 'Otro') {
+      total = dias * tarifaOtro[1] +
+          horas * tarifaOtro[0] +
+          (tarifaOtro[0] * minutos / 60) +
+          0.0;
+    }
+    return total;
   }
 
   Future<void> _selectDateAndTimeInitial(BuildContext context) async {
@@ -72,20 +144,32 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
           initialTime:
               TimeOfDay.fromDateTime(selectedDate[0] ?? DateTime.now()));
       if (pickedTime != null) {
-        if ((pickedTime.hour > 6 && pickedTime.hour < 22)) {
-          if ((pickedTime.minute == 0 && pickedTime.hour == 22 - 1) ||
-              (pickedTime.hour != 22 - 1)) {
-            setState(() {
-              selectedDate[0] = DateTime(
-                pickedDate.year,
-                pickedDate.month,
-                pickedDate.day,
-                pickedTime.hour,
-                pickedTime.minute,
-              );
-              selectedTime[0] = pickedTime;
-            });
-          }
+        if (pickedTime.hour > startDate.hour &&
+            pickedTime.hour < endDate.hour) {
+          setState(() {
+            selectedDate[0] = DateTime(
+              pickedDate.year,
+              pickedDate.month,
+              pickedDate.day,
+              pickedTime.hour,
+              pickedTime.minute,
+            );
+            arriveDate = DateTime(
+              pickedDate.year,
+              pickedDate.month,
+              pickedDate.day,
+              pickedTime.hour,
+              pickedTime.minute,
+            );
+            selectedTime[0] = pickedTime;
+            if (exitDate.difference(arriveDate).inMinutes < 0) {
+              totalController.text = 'Selecciona Fecha y Hora';
+            }
+            if (fechaFinController.text != 'Selecciona Fecha y Hora') {
+              totalController.text =
+                  "Total: " + getTotal().toStringAsFixed(2) + " Bs";
+            }
+          });
         } else {
           if (!context.mounted) return;
           Toast.show(context, 'Horario no disponible');
@@ -121,7 +205,8 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
           initialTime:
               TimeOfDay.fromDateTime(selectedDate[0] ?? DateTime.now()));
       if (pickedTime != null) {
-        if (pickedTime.hour > 6 && pickedTime.hour < 22) {
+        if (pickedTime.hour > startDate.hour &&
+            pickedTime.hour < endDate.hour) {
           setState(() {
             selectedDate[1] = DateTime(
               pickedDate.year,
@@ -130,9 +215,20 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
               pickedTime.hour,
               pickedTime.minute,
             );
+            exitDate = DateTime(
+              pickedDate.year,
+              pickedDate.month,
+              pickedDate.day,
+              pickedTime.hour,
+              pickedTime.minute,
+            );
             selectedTime[1] = pickedTime;
+            totalController.text =
+                "Total: " + getTotal().toStringAsFixed(2) + " Bs";
           });
         } else {
+          if ((pickedTime.minute == 0 && pickedTime.hour == endDate.hour - 1) ||
+              (pickedTime.hour != endDate.hour - 1)) {}
           if (!context.mounted) return;
           Toast.show(context, 'Horario no disponible');
         }
@@ -256,49 +352,170 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
             ),
             const SizedBox(
                 height: 50.0), // Espacio entre el Card y el nuevo texto
-            const Column(
-              children: [
-                Text(
-                  'Vehiculo',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 20,
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: InkwellPerzonalized(
-                    inkwellData: InkwellData(
-                      isChecked: isChecked[0],
-                      message: 'Motos',
-                      priceString: '\$10',
+            Container(
+              padding: const EdgeInsets.only(top: 14, left: 14),
+              decoration: BoxDecoration(
+                color: Colors.grey[300], // Color gris
+                borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Vehículo',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                const SizedBox(width: 10.0),
-                Expanded(
-                  child: InkwellPerzonalized(
-                    inkwellData: InkwellData(
-                        isChecked: isChecked[1],
-                        message: 'Auto',
-                        priceString: '\$12'),
+                  Row(
+                    children: [
+                      Row(
+                        children: <Widget>[
+                          Radio(
+                            value: 'Automóvil',
+                            groupValue: typeVehicle,
+                            onChanged: (val) {
+                              setState(() {
+                                typeVehicle = val!;
+                              });
+                            },
+                          ),
+                          const Text('Automóvil'),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Radio(
+                            value: 'Moto',
+                            groupValue: typeVehicle,
+                            onChanged: (value) {
+                              setState(() {
+                                typeVehicle = value!;
+                              });
+                            },
+                          ),
+                          const Text('Moto'),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Radio(
+                            value: 'Otro',
+                            groupValue: typeVehicle,
+                            onChanged: (value) {
+                              setState(() {
+                                typeVehicle = value!;
+                              });
+                            },
+                          ),
+                          const Text('Otro'),
+                        ],
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 10.0),
-                Expanded(
-                  child: InkwellPerzonalized(
-                    inkwellData: InkwellData(
-                        isChecked: isChecked[2],
-                        message: 'Otro',
-                        priceString: '\$14'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: const Color.fromARGB(220, 217, 217, 217),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Tarifas",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 20,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 20, left: 10),
+                    child: Text(
+                      'Autos',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: tarifaAutomovilController,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            // Ajusta estos valores según tus necesidades
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 20, left: 10),
+                    child: Text(
+                      'Motos',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: tarifaMotoController,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            // Ajusta estos valores según tus necesidades
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 20, left: 10),
+                    child: Text(
+                      'Otros',
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: tarifaOtrosController,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            // Ajusta estos valores según tus necesidades
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             Container(
@@ -447,18 +664,19 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
               ],
             ),
             const SizedBox(height: 30),
-            Container(
-              padding: const EdgeInsets.only(left: 100, right: 100),
-              child: Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.grey[500],
+            TextFormField(
+              controller: totalController,
+              readOnly: true,
+              decoration: InputDecoration(
+                hintText: 'Total 0 Bs',
+                hintStyle: const TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 18,
                 ),
-                child: const Text(
-                  'Precio',
-                  maxLines: 1,
+                filled: true,
+                fillColor: const Color(0xFFE8ECF4),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
             ),
@@ -485,22 +703,16 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                       idParqueo: widget.dataSearch.idParqueo,
                       fechaInicio: Timestamp.fromDate(selectedDate[0]!),
                       fechaFin: Timestamp.fromDate(selectedDate[1]!),
-                      tieneCobertura: radioValue);
-                  if (isChecked[0]) {
-                    dataSearch.tipoVehiculo = 'Automóvil';
-                  } else if (isChecked[1]) {
-                    dataSearch.tipoVehiculo = 'Moto';
-                  } else if (isChecked[2]) {
-                    dataSearch.tipoVehiculo = 'Otro';
-                  }
-                  dataSearch.total = 50.4;
+                      tieneCobertura: radioValue,
+                      tipoVehiculo: typeVehicle,
+                      total: getTotal());
                   //SelectSpaceScreen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PlazaListScreen(
-                            dataSearch: dataSearch)), //),
-                  );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                SelectSpaceScreen(dataSearch: dataSearch)), //),
+                      );
                 },
               ),
             )

@@ -70,36 +70,22 @@ class _ParqueoListScreenState extends State<ParqueoListScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-
       appBar: AppBar(
-
         title: const Text('Lista de Parqueos'),
-
         backgroundColor: Colors.blue,
-
       ),
-
-      body: StreamBuilder(
-        
+      body: StreamBuilder(       
         stream: obtenerParqueosStream(),
-
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-
           if (snapshot.connectionState == ConnectionState.waiting) {
-
             return const CircularProgressIndicator();
-
           }
-
- 
 
           if (snapshot.hasError) {
 
             return Text('Error: ${snapshot.error}');
 
           }
-
- 
 
           // Obtén la lista de Parqueos
 
@@ -108,9 +94,7 @@ class _ParqueoListScreenState extends State<ParqueoListScreen> {
                 snapshot.data!.docs.map((DocumentSnapshot document) {
 
               Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-
               String idDocumento = document.id; // Obtener el ID del documento
-
               return Parqueo(idParqueo: document.reference,nombre: data['nombre'],direccion: data['direccion'],ubicacion: data['ubicacion'],
                              tieneCobertura: data['tieneCobertura'],descripcion: data['descripcion'],vehiculosPermitidos: data['vehiculosPermitidos'],nit: data['nit'],
                              tarifaMoto:data['tarifaMoto'],tarifaAutomovil: data['tarifaAutomovil'],tarifaOtro: data['tarifaOtro'], 
@@ -119,41 +103,24 @@ class _ParqueoListScreenState extends State<ParqueoListScreen> {
 
 
             }).toList();
-
- 
-
           return ListView.builder(
-
             itemCount: parqueos.length,
-
             itemBuilder: (context, index) {
-
               final parqueo = parqueos[index];
-
               return InkWell(
-
                 onTap: () {
-
                   // Aquí puedes definir la acción que se realizará al hacer clic en el elemento.
-
                   // Por ejemplo, puedes abrir una pantalla de detalles de la plaza.
-
                   //abrirDetallesPlaza(plaza);
                   Navigator.push(
-
                     context,
-
                     MaterialPageRoute(
-
                     builder: (context) => CreatePisoScreen(idParqueo:parqueo.idParqueo),
-
                     ),
 
                   );
 
-                },
-                
-                
+                },   
 
                 child: ListTile(
 
@@ -1020,7 +987,7 @@ Future<void> editarPlaza(String idParqueo, String idPiso, String idFila,
 
   } catch (e) {
 
-    print('Error al editar la plaza: $e');
+    log('Error al editar la plaza: $e');
 
   }
 
@@ -1072,7 +1039,7 @@ Future<List<Plaza>> getPlaces(
 
   } catch (e) {
 
-    print('Error al obtener las plazas: $e');
+    log('Error al obtener las plazas: $e');
 
     return [];
 
@@ -1095,9 +1062,9 @@ Stream<QuerySnapshot> obtenerParqueosStream() {
 
   } catch (e) {
 
-    print('Error al obtener el Stream de plazas: $e');
+    log('Error al obtener el Stream de plazas: $e');
 
-    throw e;
+    rethrow;
 
   }
 

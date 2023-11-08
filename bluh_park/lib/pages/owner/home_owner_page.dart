@@ -213,14 +213,11 @@ class _HomeOwnerState extends State<HomeOwner> {
                           size: 40,
                           color: Colors.green,
                         ),
-                        ListTile(
-                          title: Text(
-                            "Ubicación Mis Parqueos",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                      Text(
+                            "Ubicacion Mis Parqueos",
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ),
+                        SizedBox(height: 10),
                         //SizedBox(child: MapOwner()),
                       ],
                     ),
