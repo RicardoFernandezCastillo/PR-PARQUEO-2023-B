@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = bluh_park
+PRODUCT_NAME = bluehpark
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.codigocorrecto.bluhPark
+PRODUCT_BUNDLE_IDENTIFIER = com.example.bluehpark
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2023 com.codigocorrecto. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2023 com.example. All rights reserved.

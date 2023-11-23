@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.codigocorrecto" "\0"
-            VALUE "FileDescription", "bluh_park" "\0"
+            VALUE "CompanyName", "com.example" "\0"
+            VALUE "FileDescription", "bluehpark" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "bluh_park" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.codigocorrecto. All rights reserved." "\0"
-            VALUE "OriginalFilename", "bluh_park.exe" "\0"
-            VALUE "ProductName", "bluh_park" "\0"
+            VALUE "InternalName", "bluehpark" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "bluehpark.exe" "\0"
+            VALUE "ProductName", "bluehpark" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

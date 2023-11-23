@@ -55,7 +55,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCAVJYv2arw46-yEBR_Mk_aSFsUdnO47p0',
-    appId: '1:198230389564:android:ac9b870d297f11a2536439',
+    appId: '1:198230389564:android:77e1cb3032632283536439',
     messagingSenderId: '198230389564',
     projectId: 'bluh-park',
     storageBucket: 'bluh-park.appspot.com',
@@ -63,21 +63,21 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAxrvX4UrbNQQFjTseKdcG2NjMMxEUR7F0',
-    appId: '1:198230389564:ios:5c349a87691d48cc536439',
+    appId: '1:198230389564:ios:b75a033eb2f07a48536439',
     messagingSenderId: '198230389564',
     projectId: 'bluh-park',
     storageBucket: 'bluh-park.appspot.com',
-    iosClientId: '198230389564-aqau0m9qce1r8iirmrf9v8q3p9atitcj.apps.googleusercontent.com',
-    iosBundleId: 'com.codigocorrecto.bluhPark',
+    iosClientId: '198230389564-4h91truusjrkcnbu9u1dijiv0oufnbol.apps.googleusercontent.com',
+    iosBundleId: 'com.example.bluehpark',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAxrvX4UrbNQQFjTseKdcG2NjMMxEUR7F0',
-    appId: '1:198230389564:ios:7eccbd519b6abd70536439',
+    appId: '1:198230389564:ios:810ee7d3258bbe32536439',
     messagingSenderId: '198230389564',
     projectId: 'bluh-park',
     storageBucket: 'bluh-park.appspot.com',
-    iosClientId: '198230389564-2do2heopajn9imnbj4n960u7ep9560s3.apps.googleusercontent.com',
-    iosBundleId: 'com.codigocorrecto.bluhPark.RunnerTests',
+    iosClientId: '198230389564-cn12pet1r156jhd3sarfa9sgjanptvuk.apps.googleusercontent.com',
+    iosBundleId: 'com.example.bluehpark.RunnerTests',
   );
 }
