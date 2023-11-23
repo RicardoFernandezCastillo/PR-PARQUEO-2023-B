@@ -20,6 +20,12 @@ class CreatePisoScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Formulario de Piso'),
           backgroundColor: const Color.fromARGB(255, 5, 126, 225),
+              leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+          )
         ),
         body: PisoListScreen(
           idParqueo: idParqueo,
@@ -42,10 +48,6 @@ class _PisoListScreenState extends State<PisoListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lista de Pisos'),
-        backgroundColor: Colors.blue,
-      ),
       body: StreamBuilder(
         stream: getPisos(widget.idParqueo),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {

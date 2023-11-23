@@ -56,15 +56,15 @@ class _TicketsListState extends State<TicketsList> {
                     String idDocumento = document.id;
                     return Ticket(
                         idTicket: idDocumento,
-                        brand: data['brand'],
-                        date: data['date'].toDate(),
-                        dateArrive: data['dateArrive'].toDate(),
-                        dateOut: data['dateOut'].toDate(),
-                        model: data['model'],
-                        plate: data['plate'],
-                        status: data['status'],
-                        total: data['total'],
-                        typeVehicle: data['typeVehicle']);
+                        brand: data['vehiculo']['marcaVehiculo'],
+                        date: data['fecha'].toDate(),
+                        dateArrive: data['fechaLlegada'].toDate(),
+                        dateOut: data['fechaSalida'].toDate(),
+                        model: data['vehiculo']['modeloVehiculo'],
+                        plate: data['vehiculo']['placaVehiculo'],
+                        status: data['estado'],
+                        total: data['total'].toDouble(),
+                        typeVehicle: data['vehiculo']['tipo']);
                   }).toList();
                   return ListView.builder(
                     itemCount: tickets.length,

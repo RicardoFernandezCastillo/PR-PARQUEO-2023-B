@@ -13,7 +13,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-
 class LoginPage extends StatelessWidget {
   static const routeName = '/login-screen-page';
   LoginPage({super.key});
@@ -22,7 +21,41 @@ class LoginPage extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  Future<void> checkSession(BuildContext context) async {
+    final User? user = FirebaseAuth.instance.currentUser;
 
+    if (user != null) {
+      final firestore = FirebaseFirestore.instance;
+      final document = firestore.collection(Collection.usuarios).doc(user.uid);
+      final docSnapshot = await document.get();
+      // El usuario ha iniciado sesión y user contiene la información del usuario.
+      final data = docSnapshot.data() as Map<String, dynamic>;
+      if (data[UsersCollection.estado] == 'habilitado') {
+        if (data['tipo'] == "Cliente") {
+          if (!context.mounted) return;
+          ProgressDialog.hide(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MenuClient(),
+            ),
+          );
+        } else if (data['tipo'] == "Dueño") {
+          if (!context.mounted) return;
+          // ignore: use_build_context_synchronously
+          ProgressDialog.hide(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MenuOwner(),
+            ),
+          );
+        }
+      } else {
+        // El usuario no ha iniciado sesión.
+      }
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,15 +66,15 @@ class LoginPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 50),          
+                const SizedBox(height: 50),
                 // logo
                 const Icon(
                   Icons.car_repair,
                   size: 100,
                 ),
-          
+
                 const SizedBox(height: 50),
-          
+
                 // welcome back, you've been missed!
                 Text(
                   'Bienvenido a Blueh Park!',
@@ -50,27 +83,27 @@ class LoginPage extends StatelessWidget {
                     fontSize: 16,
                   ),
                 ),
-          
+
                 const SizedBox(height: 25),
-          
+
                 // username textfield
                 MyTextField(
                   controller: emailController,
                   hintText: 'Correo',
                   obscureText: false,
                 ),
-          
+
                 const SizedBox(height: 10),
-          
+
                 // password textfield
                 MyTextField(
                   controller: passwordController,
                   hintText: 'Contraseña',
                   obscureText: true,
                 ),
-          
+
                 const SizedBox(height: 10),
-          
+
                 // forgot password?
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -84,70 +117,67 @@ class LoginPage extends StatelessWidget {
                     ],
                   ),
                 ),
-          
+
                 const SizedBox(height: 25),
                 InkWell(
                   onTap: () async {
-                          if (!context.mounted) return;
-                          ProgressDialog.show(context, 'Iniciando Sesión...');
-                          UserCredential? credential = await auntenticator(
-                              emailController.text, passwordController.text);
+                    if (!context.mounted) return;
+                    ProgressDialog.show(context, 'Iniciando Sesión...');
+                    UserCredential? credential = await auntenticator(
+                        emailController.text, passwordController.text);
 
-                          if (credential != null) {
-                            String id = credential.user!.uid;
-                            DocumentReference userReference = FirebaseFirestore.instance
-                                .collection(Collection.usuarios)
-                                .doc(id);
-                            DocumentSnapshot<Map<String, dynamic>> user =
-                            await userReference.get() as DocumentSnapshot<Map<String, dynamic>>;
-                            
-                            if (!context.mounted) return;
-                            ProgressDialog.hide(context);
-                            // Autenticación exitosa, puedes navegar a la siguiente pantalla
-                            if(user['tipo']=="Cliente"){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const MenuClient(),
-                                ),
-                              );
-                            }
-                            else if (user['tipo']=="Dueño"){
-                                Navigator.push(
-                                context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const MenuOwner(),
-                                  ),
-                                );
-                            }
-                            else if (user['tipo']=="Admin"){
+                    if (credential != null) {
+                      String id = credential.user!.uid;
+                      DocumentReference userReference = FirebaseFirestore
+                          .instance
+                          .collection(Collection.usuarios)
+                          .doc(id);
+                      DocumentSnapshot<Map<String, dynamic>> user =
+                          await userReference.get()
+                              as DocumentSnapshot<Map<String, dynamic>>;
 
-                            }
-
-                          } else {
-                              if (!context.mounted) return;
-                              ProgressDialog.hide(context);
-                            // Autenticación fallida, muestra un mensaje de error
-                            showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Error de autenticación'),
-                                content: const Text(
-                                    'Usuario o contraseña incorrectos.'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Aceptar'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                          /*Navigator.of(context).push(MaterialPageRoute(
+                      if (!context.mounted) return;
+                      ProgressDialog.hide(context);
+                      // Autenticación exitosa, puedes navegar a la siguiente pantalla
+                      if (user['tipo'] == "Cliente") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MenuClient(),
+                          ),
+                        );
+                      } else if (user['tipo'] == "Dueño") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MenuOwner(),
+                          ),
+                        );
+                      } else if (user['tipo'] == "Admin") {}
+                    } else {
+                      if (!context.mounted) return;
+                      ProgressDialog.hide(context);
+                      // Autenticación fallida, muestra un mensaje de error
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Error de autenticación'),
+                          content:
+                              const Text('Usuario o contraseña incorrectos.'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Aceptar'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    /*Navigator.of(context).push(MaterialPageRoute(
                               builder: (ctx) => const SuccessfulScreen()));*/
-                        },
+                  },
                   child: Container(
                     padding: const EdgeInsets.all(25),
                     margin: const EdgeInsets.symmetric(horizontal: 25),
@@ -195,9 +225,9 @@ class LoginPage extends StatelessWidget {
                     ],
                   ),
                 ),
-          
+
                 const SizedBox(height: 50),
-          
+
                 // google sign in button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -208,7 +238,8 @@ class LoginPage extends StatelessWidget {
                         try {
                           ProgressDialog.show(context, 'Iniciando Sesión...');
                           AuthService authService = AuthService();
-                          final User? user = await authService.signInWithGoogle();
+                          final User? user =
+                              await authService.signInWithGoogle();
                           if (!context.mounted) return;
 
                           if (user != null) {
@@ -222,47 +253,46 @@ class LoginPage extends StatelessWidget {
                                 .doc(user.uid);
                             final docSnapshot2 = await document2.get();
                             if (docSnapshot.exists) {
-                                final data =
+                              final data =
                                   docSnapshot.data() as Map<String, dynamic>;
-                                if(data[UsersCollection.estado]=='habilitado'){
-                                  if(data['tipo']=="Cliente"){
-                                    if (!context.mounted) return;
-                                    ProgressDialog.hide(context);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const MenuClient(),
-                                      ),
-                                    );
-                                  }
-                                  else if (data['tipo']=="Dueño"){
-                                      if (!context.mounted) return;
-                                        // ignore: use_build_context_synchronously
-                                        ProgressDialog.hide(context);
-                                        Navigator.push(
-                                        context,
-                                          MaterialPageRoute(
-                                            builder: (context) => const MenuOwner(),
-                                          ),
-                                        );
-                                    }
-                                  else if(data['tipo']=="Admin"){
-                                    if (!context.mounted) return;
-                                    // ignore: use_build_context_synchronously
-                                    ProgressDialog.hide(context);
-                                    Navigator.push(
-                                    context,
-                                      MaterialPageRoute(
-                                        builder: (context) => const AccountRequestScreen(),
-                                      ),
-                                    );
-                                  }
-                                }
-                                else{
+                              if (data[UsersCollection.estado] ==
+                                  'habilitado') {
+                                if (data['tipo'] == "Cliente") {
                                   if (!context.mounted) return;
                                   ProgressDialog.hide(context);
-                                  Toast.show(context, 'Cuenta Inhabilitada');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const MenuClient(),
+                                    ),
+                                  );
+                                } else if (data['tipo'] == "Dueño") {
+                                  if (!context.mounted) return;
+                                  // ignore: use_build_context_synchronously
+                                  ProgressDialog.hide(context);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const MenuOwner(),
+                                    ),
+                                  );
+                                } else if (data['tipo'] == "Admin") {
+                                  if (!context.mounted) return;
+                                  // ignore: use_build_context_synchronously
+                                  ProgressDialog.hide(context);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AccountRequestScreen(),
+                                    ),
+                                  );
                                 }
+                              } else {
+                                if (!context.mounted) return;
+                                ProgressDialog.hide(context);
+                                Toast.show(context, 'Cuenta Inhabilitada');
+                              }
                             } else if (docSnapshot2.exists) {
                               final data =
                                   docSnapshot2.data() as Map<String, dynamic>;
@@ -271,7 +301,8 @@ class LoginPage extends StatelessWidget {
                                 // El campo 'correo' existe en el documento.
                                 if (!context.mounted) return;
                                 ProgressDialog.hide(context);
-                                Toast.show(context, 'Cuenta pendiente de aprobación');
+                                Toast.show(
+                                    context, 'Cuenta pendiente de aprobación');
                                 // Realiza las acciones que desees en este caso.
                               } else {
                                 // El campo 'correo' no existe en el documento.
@@ -292,8 +323,7 @@ class LoginPage extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      const TypeUserRequest(),
+                                  builder: (context) => const TypeUserRequest(),
                                 ),
                               );
                               // Realiza acciones si el documento no existe.
@@ -324,9 +354,8 @@ class LoginPage extends StatelessWidget {
                   ],
                 ),
 
-          
                 const SizedBox(height: 50),
-          
+
                 // not a member? register now
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -342,7 +371,6 @@ class LoginPage extends StatelessWidget {
                         color: Colors.blue,
                         fontWeight: FontWeight.bold,
                       ),
-                      
                     ),
                   ],
                 )
@@ -353,4 +381,5 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
+
 }

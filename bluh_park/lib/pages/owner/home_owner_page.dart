@@ -74,7 +74,7 @@ class _HomeOwnerState extends State<HomeOwner> {
                               Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const PlazaListScreen()));
+                                  builder: (context) => const OwnerParkingsScreen()));
                             },
                             iconSize: 50,
                             color: const Color(0xff2e61e6),
@@ -121,7 +121,7 @@ class _HomeOwnerState extends State<HomeOwner> {
                   child: const Column(
                     children: [
                       Text(
-                        'Recaudado Hoy',
+                        'Recaudaciones:',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -136,7 +136,7 @@ class _HomeOwnerState extends State<HomeOwner> {
                               )),
                           SizedBox(width: 8),
                           Text(
-                            'Magallanez: 650 Bs',
+                            'Magallanez: 0 Bs',
                             style: TextStyle(
                               fontSize: 16,
                             ),

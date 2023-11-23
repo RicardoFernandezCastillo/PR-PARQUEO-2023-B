@@ -7,7 +7,7 @@ class Ticket {
   late String model;
   late String plate;
   late String status;
-  late int total;
+  late double total;
   late String typeVehicle;
 
   Ticket({

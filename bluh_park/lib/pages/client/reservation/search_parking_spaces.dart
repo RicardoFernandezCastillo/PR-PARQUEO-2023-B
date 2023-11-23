@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 class ParkingSpaces extends StatefulWidget {
   final DataReservationSearch dataSearch;
 
-  const ParkingSpaces({Key? key, required this.dataSearch}) : super(key: key);
+  const ParkingSpaces({super.key, required this.dataSearch});
 
   @override
   State<ParkingSpaces> createState() => _ParkingSpacesState();
@@ -37,6 +37,8 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
 
+  String urlImage = "";
+
   List<DateTime?> selectedDate = [null, null];
   List<TimeOfDay?> selectedTime = [null, null];
   @override
@@ -47,7 +49,6 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
 
   Future<void> loadDataParqueo() async {
     try {
-
       /*
             DocumentSnapshot<Map<String, dynamic>> parqueoDoc =
           await widget.dataSearch.idParqueo.get()
@@ -55,8 +56,7 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
 
       Map<String, dynamic> data = parqueoDoc.data() as Map<String, dynamic>;
        */
-      DocumentSnapshot parqueoDoc =
-          await widget.dataSearch.idParqueo.get();
+      DocumentSnapshot parqueoDoc = await widget.dataSearch.idParqueo.get();
 
       Map<String, dynamic> data = parqueoDoc.data() as Map<String, dynamic>;
       setState(() {
@@ -64,6 +64,7 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
         vehiclesAllowed[0] = data['vehiculosPermitidos']['Motos'];
         vehiclesAllowed[1] = data['vehiculosPermitidos']['Autos'];
         vehiclesAllowed[2] = data['vehiculosPermitidos']['Otros'];
+        urlImage = data['url'];
 
         tarifaAutomovil[0] = data['tarifaAutomovil']['Hora'].toDouble();
         tarifaAutomovil[1] = data['tarifaAutomovil']['Dia'].toDouble();
@@ -162,8 +163,11 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
               pickedTime.minute,
             );
             selectedTime[0] = pickedTime;
-            if (exitDate.difference(arriveDate).inMinutes < 0) {
-              totalController.text = 'Selecciona Fecha y Hora';
+            if (exitDate.difference(arriveDate).inMinutes < 60) {
+              fechaFinController.text = 'Selecciona Fecha y Hora';
+              selectedDate[1] = null;
+              totalController.text = "Total: 0.00 Bs";
+              return;
             }
             if (fechaFinController.text != 'Selecciona Fecha y Hora') {
               totalController.text =
@@ -175,6 +179,15 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
           Toast.show(context, 'Horario no disponible');
         }
       }
+    }
+  }
+
+  void updatePrice() {
+    if (exitDate.difference(arriveDate).inMinutes < 0) {
+      fechaFinController.text = 'Selecciona Fecha y Hora';
+    }
+    if (selectedDate[0] != null && selectedDate[1] != null) {
+      totalController.text = "Total: " + getTotal().toStringAsFixed(2) + " Bs";
     }
   }
 
@@ -207,28 +220,45 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
       if (pickedTime != null) {
         if (pickedTime.hour > startDate.hour &&
             pickedTime.hour < endDate.hour) {
-          setState(() {
-            selectedDate[1] = DateTime(
-              pickedDate.year,
-              pickedDate.month,
-              pickedDate.day,
-              pickedTime.hour,
-              pickedTime.minute,
-            );
-            exitDate = DateTime(
-              pickedDate.year,
-              pickedDate.month,
-              pickedDate.day,
-              pickedTime.hour,
-              pickedTime.minute,
-            );
-            selectedTime[1] = pickedTime;
-            totalController.text =
-                "Total: " + getTotal().toStringAsFixed(2) + " Bs";
-          });
-        } else {
+          var ex = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          if (ex.difference(arriveDate).inMinutes < 60 &&
+              pickedDate.day == selectedDate[0]!.day) {
+            if (!context.mounted) return;
+            Toast.show(context, 'Lapso de reserva minimo 1 hr');
+            return;
+          }
           if ((pickedTime.minute == 0 && pickedTime.hour == endDate.hour - 1) ||
-              (pickedTime.hour != endDate.hour - 1)) {}
+              (pickedTime.hour != endDate.hour - 1)) {
+            setState(() {
+              selectedDate[1] = DateTime(
+                pickedDate.year,
+                pickedDate.month,
+                pickedDate.day,
+                pickedTime.hour,
+                pickedTime.minute,
+              );
+              exitDate = DateTime(
+                pickedDate.year,
+                pickedDate.month,
+                pickedDate.day,
+                pickedTime.hour,
+                pickedTime.minute,
+              );
+              selectedTime[1] = pickedTime;
+              totalController.text =
+                  "Total: " + getTotal().toStringAsFixed(2) + " Bs";
+            });
+          } else {
+            if (!context.mounted) return;
+            Toast.show(context, 'Limite de horario Excedido');
+          }
+        } else {
           if (!context.mounted) return;
           Toast.show(context, 'Horario no disponible');
         }
@@ -242,9 +272,10 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
       appBar: AppBar(
         centerTitle: true,
         toolbarHeight: 70,
-        titleTextStyle: const TextStyle(fontSize: 25, color: Colors.white),
+        titleTextStyle: const TextStyle(
+            fontSize: 25, color: Color.fromARGB(255, 7, 17, 128)),
         title: const Text(
-          'Reserva de Parking',
+          'Reserva',
         ),
         leading: IconButton(
           icon: const Icon(
@@ -267,9 +298,9 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                   borderRadius: BorderRadius.circular(10),
                   child: Stack(
                     children: <Widget>[
-                      Image.asset(
+                      Image.network(
                         // url!,
-                        'assets/img_parking_reserve.jpg',
+                        urlImage,
                         width: double.infinity,
                         height: 220,
                         fit: BoxFit.cover,
@@ -307,7 +338,7 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                                     ),
                                     const SizedBox(width: 10.0),
                                     const Text(
-                                      '4.0',
+                                      '5.0',
                                     ),
                                   ],
                                 ),
@@ -330,7 +361,7 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                                           ),
                                         ),
                                         const Text(
-                                          "\$ 20/Hora",
+                                          "-----------------------",
                                           style: TextStyle(
                                             color:
                                                 Color.fromARGB(255, 0, 0, 255),
@@ -378,6 +409,8 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                             groupValue: typeVehicle,
                             onChanged: (val) {
                               setState(() {
+                                updatePrice();
+
                                 typeVehicle = val!;
                               });
                             },
@@ -393,6 +426,7 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                             onChanged: (value) {
                               setState(() {
                                 typeVehicle = value!;
+                                updatePrice();
                               });
                             },
                           ),
@@ -407,6 +441,7 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                             onChanged: (value) {
                               setState(() {
                                 typeVehicle = value!;
+                                updatePrice();
                               });
                             },
                           ),
@@ -707,12 +742,12 @@ class _ParkingSpacesState extends State<ParkingSpaces> {
                       tipoVehiculo: typeVehicle,
                       total: getTotal());
                   //SelectSpaceScreen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                SelectSpaceScreen(dataSearch: dataSearch)), //),
-                      );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            SelectSpaceScreen(dataSearch: dataSearch)), //),
+                  );
                 },
               ),
             )

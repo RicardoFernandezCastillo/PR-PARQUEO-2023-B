@@ -14,9 +14,17 @@ class SelectSpaceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        
         appBar: AppBar(
+              leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
             title: const Text('Plazas Disponibles'),
             backgroundColor: const Color.fromARGB(255, 5, 126, 225)),
+            
         body: PlazaListScreen(
           dataSearch: dataSearch,
         ),
@@ -112,7 +120,7 @@ class PlazaListScreenState extends State<PlazaListScreen> {
                       style: const TextStyle(fontSize: 16.0),
                     ),
                     trailing: IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      icon: const Icon(Icons.local_parking, color: Colors.blue),
                       onPressed: () {
                         DataReservationSearch dataSearch = widget.dataSearch;
                         dataSearch.plaza = plaza.nombre;

@@ -18,6 +18,8 @@ class Reserva {
 class CreateReservaScreen extends StatelessWidget {
   static const routeName = '/vista-reserva';
 
+  const CreateReservaScreen({super.key});
+
   //final String idParqueo;
 
   //CreateReservaScreen({required this.idParqueo});
@@ -27,6 +29,12 @@ class CreateReservaScreen extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: const Text('Formulario de Reserva'),
           backgroundColor: const Color.fromARGB(255, 5, 126, 225),
         ),

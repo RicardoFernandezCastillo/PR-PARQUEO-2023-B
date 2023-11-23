@@ -17,9 +17,8 @@ import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:flutter/material.dart';
 
 class TypeUser extends StatelessWidget {
-  const TypeUser({
-    Key? key,
-  }) : super(key: key);
+  static const routeName = '/login-screenge';
+  const TypeUser({super.key});
 
   @override
   Widget build(BuildContext context) {

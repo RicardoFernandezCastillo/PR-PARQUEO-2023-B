@@ -5,6 +5,7 @@ import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/models/to_use/parking.dart';
 import 'package:bluehpark/models/user.dart';
 import 'package:bluehpark/pages/client/home_client_page.dart';
+import 'package:bluehpark/pages/client/navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -37,7 +38,7 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
   bool radioValue = false;
   List<bool> checkboxValues = [false, false, false];
   String typeVehicle = "";
-
+  String urlImage = "";
   @override
   void initState() {
     super.initState();
@@ -92,6 +93,7 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
         checkboxValues[2] = true;
       }
       estadoController.text = dataPlace['estado'];
+      urlImage = dataParking['url'];
       // placaController.text = dataReserve['vehiculo']['placa'];
       // marcaController.text = dataReserve['vehiculo']['marca'];
       // colorController.text = dataReserve['vehiculo']['color'];
@@ -140,8 +142,9 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
               child: Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
-                  child: Image.asset(
-                    'assets/img_parqueo.jpg',
+                  // ignore: prefer_const_constructors
+                  child: Image(
+                    image: const NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpoLyQqZzn-4P0nSNrtXCAAtsQM0LkSgCb6w'),
                     width: 215,
                     height: 190,
                     fit: BoxFit.cover,
@@ -589,10 +592,16 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                             style: TextStyle(fontSize: 20),
                           ),
                           onPressed: () async {
-                            final User? user = FirebaseAuth.instance.currentUser;
-                            DocumentSnapshot parqueoDoc = FirebaseFirestore.instance.collection(Collection.reservas).doc(user!.uid).get() as DocumentSnapshot<Object?>;
-                            Map<String, dynamic> userData = parqueoDoc.data() as Map<String, dynamic>;
-                            
+                            final User? user =
+                                FirebaseAuth.instance.currentUser;
+                            DocumentSnapshot<Map<String, dynamic>> userDoc =
+                                await FirebaseFirestore.instance
+                                    .collection(Collection.usuarios)
+                                    .doc(user!.uid)
+                                    .get();
+                            Map<String, dynamic> userData =
+                                userDoc.data() as Map<String, dynamic>;
+
                             Map<String, dynamic> cliente = {
                               'nombre': userData[UsersCollection.nombre],
                               'apellidos': userData[UsersCollection.apellidos],
@@ -606,27 +615,29 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
                               'modeloVehiculo': modeloController.text,
                             };
                             Map<String, dynamic> parqueo = {
-                              'nombre': nombreParqueo,
+                              'nombre': nombreParqueo.text,
                               'piso': pisoController.text,
                               'fila': filaController.text,
-                              'cuentaCobertura': widget.dataSearch.tieneCobertura
+                              'cuentaCobertura':
+                                  widget.dataSearch.tieneCobertura
                             };
 
                             Map<String, dynamic> data = {
                               'cliente': cliente,
                               'vehiculo': vehiculo,
                               'parqueo': parqueo,
-                              'estado': typeVehicle,
+                              'estado': 'activo',
                               'fechaLlegada': widget.dataSearch.fechaInicio,
                               'fechaSalida': widget.dataSearch.fechaFin,
+                              'fecha': DateTime.now(),
                               'total': widget.dataSearch.total,
                             };
                             agregarReserva(datos: data);
+                            if (!context.mounted) return;
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const HomeClient()),
+                                  builder: (context) => const MenuClient()),
                             );
                           },
                         ),
@@ -643,8 +654,12 @@ class ReservaRegisterScreenState extends State<ReservaRegisterScreen> {
   }
 
   Future<void> agregarReserva({required Map<String, dynamic> datos}) async {
-
     await FirebaseFirestore.instance.collection(Collection.reservas).add(datos);
+    await FirebaseFirestore.instance.collection(Collection.tickets).add(datos);
+    Map<String, dynamic> data = {'estado': 'noDisponible'};
+    DocumentReference plazaRef = widget.dataSearch.idPlaza!;
+    // Utiliza update para modificar campos existentes o set con merge: true para combinar datos nuevos con los existentes
+    await plazaRef.update(data);
   }
 }
 

@@ -5,16 +5,22 @@ import 'package:flutter/material.dart';
 
 class CreatePlaceScreen extends StatelessWidget {
   static const routeName = '/create-place-srceen';
-
-  const CreatePlaceScreen({super.key});
+  final DocumentReference seccionRef;
+  const CreatePlaceScreen({super.key, required this.seccionRef});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
+              leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
             title: const Text('Lista de Plazas'),
             backgroundColor: const Color.fromARGB(255, 5, 126, 225)),
-        //body: const PlazaListScreen(),
+        body: PlazaListScreen(seccionRef: seccionRef),
       ),
     );
   }
@@ -151,164 +157,166 @@ class AgregarPlazaScreenState extends State<AgregarPlazaScreen> {
         title: const Text('Agregar Nueva Plaza'),
         backgroundColor: Colors.blue,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment
-              .stretch, // Alinear los elementos al ancho completo
-          children: <Widget>[
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Nombre',
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment
+                .stretch, // Alinear los elementos al ancho completo
+            children: <Widget>[
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Nombre',
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  ),
+                ),
+                onChanged: (val) {
+                  setState(() {
+                    nombre = val;
+                  });
+                },
+              ),
+              const SizedBox(height: 20.0),
+              const Text(
+                'Tipo de Vehículo',
+                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              ),
+              Row(
+                children: <Widget>[
+                  Radio(
+                    value: 'Moto',
+                    groupValue: tipoVehiculo,
+                    onChanged: (val) {
+                      setState(() {
+                        tipoVehiculo = val!;
+                      });
+                    },
+                  ),
+                  const Text('Moto'),
+                  Radio(
+                    value: 'Automóvil',
+                    groupValue: tipoVehiculo,
+                    onChanged: (val) {
+                      setState(() {
+                        tipoVehiculo = val!;
+                      });
+                    },
+                  ),
+                  const Text('Automóvil'),
+                  Radio(
+                    value: 'Otro',
+                    groupValue: tipoVehiculo,
+                    onChanged: (val) {
+                      setState(() {
+                        tipoVehiculo = val!;
+                      });
+                    },
+                  ),
+                  const Text('Otro'),
+                ],
+              ),
+              const SizedBox(height: 20.0),
+              const Text(
+                '¿Tiene Cobertura?',
+                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              ),
+              Row(
+                children: <Widget>[
+                  Radio(
+                    value: true,
+                    groupValue: tieneCobertura,
+                    onChanged: (val) {
+                      setState(() {
+                        tieneCobertura = val!;
+                      });
+                    },
+                  ),
+                  const Text('Sí'),
+                  Radio(
+                    value: false,
+                    groupValue: tieneCobertura,
+                    onChanged: (val) {
+                      setState(() {
+                        tieneCobertura = val!;
+                      });
+                    },
+                  ),
+                  const Text('No'),
+                ],
+              ),
+              const SizedBox(height: 20.0),
+              const Text(
+                'Estado de la plaza',
+                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              ),
+              Row(
+                children: <Widget>[
+                  Radio(
+                    value: 'disponible',
+                    groupValue: estado,
+                    onChanged: (val) {
+                      setState(() {
+                        estado = val!;
+                      });
+                    },
+                  ),
+                  const Text('Disponible'),
+                  Radio(
+                    value: 'noDisponible',
+                    groupValue: estado,
+                    onChanged: (val) {
+                      setState(() {
+                        estado = val!;
+                      });
+                    },
+                  ),
+                  const Text('No Disponible'),
+                ],
+              ),
+              const SizedBox(height: 20.0),
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Descripcion',
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  ),
+                ),
+                onChanged: (val) {
+                  setState(() {
+                    descripcion = val;
+                  });
+                },
+              ),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: () async {
+                  Map<String, dynamic> datos = {
+                    'nombre': nombre, // Nombre de la plaza
+                    'tipoVehiculo': tipoVehiculo, // Tipo de vehículo permitido
+                    'tieneCobertura':
+                        tieneCobertura, // Indica si tiene cobertura o no
+                    'descripcion': descripcion, // Piso y Fila
+                    'estado': estado, // Estado
+                  };
+                  // Llama a la función para agregar el documento a la subcolección
+                  await agregarDocumentoASubcoleccion(widget.seccionRef,datos);
+                  // Crea una nueva Plaza y devuelve los datos a la pantalla anterior.
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 16.0), // Espaciado vertical para el botón
+                ),
+                child: const Text(
+                  'Agregar Plaza',
+                  style: TextStyle(fontSize: 18.0), // Tamaño de fuente del botón
                 ),
               ),
-              onChanged: (val) {
-                setState(() {
-                  nombre = val;
-                });
-              },
-            ),
-            const SizedBox(height: 20.0),
-            const Text(
-              'Tipo de Vehículo',
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-            Row(
-              children: <Widget>[
-                Radio(
-                  value: 'Moto',
-                  groupValue: tipoVehiculo,
-                  onChanged: (val) {
-                    setState(() {
-                      tipoVehiculo = val!;
-                    });
-                  },
-                ),
-                const Text('Moto'),
-                Radio(
-                  value: 'Automóvil',
-                  groupValue: tipoVehiculo,
-                  onChanged: (val) {
-                    setState(() {
-                      tipoVehiculo = val!;
-                    });
-                  },
-                ),
-                const Text('Automóvil'),
-                Radio(
-                  value: 'Otro',
-                  groupValue: tipoVehiculo,
-                  onChanged: (val) {
-                    setState(() {
-                      tipoVehiculo = val!;
-                    });
-                  },
-                ),
-                const Text('Otro'),
-              ],
-            ),
-            const SizedBox(height: 20.0),
-            const Text(
-              '¿Tiene Cobertura?',
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-            Row(
-              children: <Widget>[
-                Radio(
-                  value: true,
-                  groupValue: tieneCobertura,
-                  onChanged: (val) {
-                    setState(() {
-                      tieneCobertura = val!;
-                    });
-                  },
-                ),
-                const Text('Sí'),
-                Radio(
-                  value: false,
-                  groupValue: tieneCobertura,
-                  onChanged: (val) {
-                    setState(() {
-                      tieneCobertura = val!;
-                    });
-                  },
-                ),
-                const Text('No'),
-              ],
-            ),
-            const SizedBox(height: 20.0),
-            const Text(
-              'Estado de la plaza',
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-            Row(
-              children: <Widget>[
-                Radio(
-                  value: 'disponible',
-                  groupValue: estado,
-                  onChanged: (val) {
-                    setState(() {
-                      estado = val!;
-                    });
-                  },
-                ),
-                const Text('Disponible'),
-                Radio(
-                  value: 'noDisponible',
-                  groupValue: estado,
-                  onChanged: (val) {
-                    setState(() {
-                      estado = val!;
-                    });
-                  },
-                ),
-                const Text('No Disponible'),
-              ],
-            ),
-            const SizedBox(height: 20.0),
-            TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Descripcion',
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                ),
-              ),
-              onChanged: (val) {
-                setState(() {
-                  descripcion = val;
-                });
-              },
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () async {
-                Map<String, dynamic> datos = {
-                  'nombre': nombre, // Nombre de la plaza
-                  'tipoVehiculo': tipoVehiculo, // Tipo de vehículo permitido
-                  'tieneCobertura':
-                      tieneCobertura, // Indica si tiene cobertura o no
-                  'descripcion': descripcion, // Piso y Fila
-                  'estado': estado, // Estado
-                };
-                // Llama a la función para agregar el documento a la subcolección
-                await agregarDocumentoASubcoleccion(widget.seccionRef,datos);
-                // Crea una nueva Plaza y devuelve los datos a la pantalla anterior.
-                if (!context.mounted) return;
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: const EdgeInsets.symmetric(
-                    vertical: 16.0), // Espaciado vertical para el botón
-              ),
-              child: const Text(
-                'Agregar Plaza',
-                style: TextStyle(fontSize: 18.0), // Tamaño de fuente del botón
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

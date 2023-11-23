@@ -6,180 +6,117 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-
-
 class ParqueoDisponibleListScreen extends StatefulWidget {
+  const ParqueoDisponibleListScreen({super.key});
+  static const routeName = '/vista-parqueoDisponible';
 
-    const ParqueoDisponibleListScreen({super.key});
-    static const routeName = '/vista-parqueoDisponible';
-  
-   
-  
-    @override
-  
-    _ParqueoDisponibleListScreenState createState() => _ParqueoDisponibleListScreenState();
-  
+  @override
+  _ParqueoDisponibleListScreenState createState() =>
+      _ParqueoDisponibleListScreenState();
+}
+
+class _ParqueoDisponibleListScreenState
+    extends State<ParqueoDisponibleListScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Parqueos disponibles en tu zona'),
+        backgroundColor: Colors.blue,
+      ),
+      body: StreamBuilder(
+        stream: obtenerParqueosStream(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          }
+
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+
+          List<ParqueoPrueba> parqueos =
+              snapshot.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+            //String idDocumento = document.id; // Obtener el ID del documento
+            DocumentReference idDocumento = document.reference;
+
+            return ParqueoPrueba(
+                idDocumento,
+                data['nombre'],
+                data['direccion'],
+                data['ubicacion'],
+                data['tieneCobertura'],
+                data['descripcion'],
+                data['vehiculosPermitidos'],
+                data['nit'],
+                data['tarifaMoto'],
+                data['tarifaAutomovil'],
+                data['tarifaOtro'],
+                data['horaApertura'].toString(),
+                data['horaCierre'].toString(),
+                data['idDuenio']);
+          }).toList();
+
+          return ListView.builder(
+            itemCount: parqueos.length,
+            itemBuilder: (context, index) {
+              final parqueo = parqueos[index];
+
+              return InkWell(
+                onTap: () {
+                  // Aquí puedes definir la acción que se realizará al hacer clic en el elemento.
+
+                  // Por ejemplo, puedes abrir una pantalla de detalles de la plaza.
+
+                  //abrirDetallesPlaza(plaza);
+                  // Navigator.push(
+
+                  //   context,
+
+                  //   MaterialPageRoute(
+
+                  //   builder: (context) => MostrarDatosParqueoScreen(idParqueo:parqueo.idParqueo),
+
+                  //   ),
+
+                  // );
+                },
+                child: ListTile(
+                  title: Text(parqueo.nombre),
+                  subtitle: Text(parqueo.direccion),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
   }
-  
-   
-  
-  class _ParqueoDisponibleListScreenState extends State<ParqueoDisponibleListScreen> {
-  
-    @override
-  
-    Widget build(BuildContext context) {
-  
-      return Scaffold(
-  
-        appBar: AppBar(
-  
-          title: const Text('Parqueos disponibles en tu zona'),
-  
-          backgroundColor: Colors.blue,
-  
-        ),
-  
-        body: StreamBuilder(
-          
-          stream: obtenerParqueosStream(),
-  
-          builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-  
-            if (snapshot.connectionState == ConnectionState.waiting) {
-  
-              return const CircularProgressIndicator();
-  
-            }
-  
-   
-  
-            if (snapshot.hasError) {
-  
-              return Text('Error: ${snapshot.error}');
-  
-            }
-  
-   
-  
-            // Obtén la lista de Parqueos
-  
-              List<ParqueoPrueba> parqueos =
-  
-                  snapshot.data!.docs.map((DocumentSnapshot document) {
-  
-                Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-  
-                //String idDocumento = document.id; // Obtener el ID del documento
-                DocumentReference idDocumento = document.reference;
-  
-                return ParqueoPrueba(idDocumento , data['nombre'], data['direccion'], data['ubicacion'],
-                               data['tieneCobertura'], data['descripcion'], data['vehiculosPermitidos'], data['nit'],
-                               data['tarifaMoto'], data['tarifaAutomovil'], data['tarifaOtro'], 
-                               data['horaApertura'].toString(), data['horaCierre'].toString(), data['idDuenio']);
-                                
-  
-  
-              }).toList();
-  
-   
-  
-            return ListView.builder(
-  
-              itemCount: parqueos.length,
-  
-              itemBuilder: (context, index) {
-  
-                final parqueo = parqueos[index];
-  
-                return InkWell(
-  
-                  onTap: () {
-                    
-                    // Aquí puedes definir la acción que se realizará al hacer clic en el elemento.
-  
-                    // Por ejemplo, puedes abrir una pantalla de detalles de la plaza.
-  
-                    //abrirDetallesPlaza(plaza);
-                    // Navigator.push(
-  
-                    //   context,
-  
-                    //   MaterialPageRoute(
-  
-                    //   builder: (context) => MostrarDatosParqueoScreen(idParqueo:parqueo.idParqueo),
-  
-                    //   ),
-  
-                    // );
-  
-                  },
-                  
-                  
-  
-                  child: ListTile(
-  
-                    title: Text(parqueo.nombre),
-  
-                    subtitle: Text(
-  
-                        parqueo.direccion),
-  
-                    
-  
-                  ),
-  
-                );
-  
-              },
-  
-            );
-  
-          },
-  
-        ),
-  
-  
-      );
-  
-    }
-  
+}
+
+Stream<QuerySnapshot> obtenerParqueosStream() {
+  try {
+    CollectionReference parqueosCollection =
+        FirebaseFirestore.instance.collection('parqueo');
+
+    return parqueosCollection
+        .snapshots(); // Devuelve un Stream que escucha cambios en la colección.
+  } catch (e) {
+    log('Error al obtener el Stream de plazas: $e');
+
+    rethrow;
   }
-
-
-  Stream<QuerySnapshot> obtenerParqueosStream() {
-
-    try {
-  
-      CollectionReference parqueosCollection = FirebaseFirestore.instance
-  
-          .collection('parqueo');
-  
-  
-          
-  
-      return parqueosCollection
-  
-          .snapshots(); // Devuelve un Stream que escucha cambios en la colección.
-  
-    } catch (e) {
-  
-      log('Error al obtener el Stream de plazas: $e');
-  
-      rethrow;
-  
-    }
-  
-  }
-
+}
 
 class MostrarDatosParqueoScreen extends StatefulWidget {
-  
-
   final DataReservationSearch dataSearch; // Recibe el ID de la plaza
   const MostrarDatosParqueoScreen({super.key, required this.dataSearch});
 
   @override
-  State<MostrarDatosParqueoScreen> createState() => _MostrarDatosParqueoScreenState();
+  State<MostrarDatosParqueoScreen> createState() =>
+      _MostrarDatosParqueoScreenState();
 }
 
 class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
@@ -201,6 +138,11 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
   Timestamp? timeHoraApertura;
   Timestamp? timeHoraCierre;
 
+  bool automovil = false;
+  bool moto = false;
+  bool otro = false;
+  String urlImage = '';
+
   List<DateTime?> selectedDate = [null, null];
 
   bool? tieneCobertura;
@@ -214,7 +156,6 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
 
   Future<void> cargarDatosParqueo() async {
     try {
-
       DocumentReference parqueoRef = widget.dataSearch.idParqueo;
       DocumentSnapshot<Map<String, dynamic>> plazaDoc =
           await parqueoRef.get() as DocumentSnapshot<Map<String, dynamic>>;
@@ -234,6 +175,12 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
           selectedDate[1] = timeHoraCierre?.toDate();
 
           tieneCobertura = data['tieneCobertura'];
+
+          urlImage = data['url'];
+
+          automovil = data['vehiculosPermitidos']['Autos'];
+          moto = data['vehiculosPermitidos']['Motos'];
+          otro = data['vehiculosPermitidos']['Otros'];
 
           tarifaAutomovilControllerHora.text =
               "Hora " + data['tarifaAutomovil']['Hora'].toString() + ' Bs';
@@ -285,8 +232,8 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    'assets/img_parqueo.jpg',
+                  child: Image(
+                    image: NetworkImage(urlImage),
                     width: size.width * 0.7,
                   ),
                 ),
@@ -322,10 +269,10 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
                         borderRadius: BorderRadius.circular(10),
                         color: const Color.fromARGB(220, 217, 217, 217),
                       ),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
+                          const Padding(
                             padding: EdgeInsets.all(10.0),
                             child: Text(
                               'Vehiculos Permitidos',
@@ -335,42 +282,25 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              IgnorePointer(
-                                ignoring:
-                                    true, // Esto hace que los Checkbox sean de solo lectura
-                                child: Radio(
-                                  groupValue: 'permitidos',
-                                  value: true,
-                                  onChanged: null,
-                                  activeColor: Colors
-                                      .blueAccent, // Pasar null a onChanged deshabilita la interacción
-                                ),
+                              Checkbox(
+                                value: automovil,
+                                onChanged: (bool? value) {},
                               ),
-                              Text('Motos'),
-                              IgnorePointer(
-                                ignoring: true,
-                                child: Radio(
-                                  groupValue: 'permitidos',
-                                  value: false,
-                                  onChanged: null,
-                                ),
+                              const Text("Autos"),
+                              Checkbox(
+                                value: moto,
+                                onChanged: (bool? value) {},
                               ),
-                              Text('Automoviles'),
-                              IgnorePointer(
-                                ignoring: false,
-                                child: Radio(
-                                  groupValue: 'permitidos',
-                                  value: false,
-                                  onChanged: null,
-                                ),
+                              const Text("Motos"),
+                              Checkbox(
+                                value: otro,
+                                onChanged: (bool? value) {},
                               ),
-                              Text(
-                                'Otros',
-                              ),
+                              const Text("Otros"),
                             ],
                           )
                         ],
@@ -511,7 +441,7 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
                                                   8), // Espacio entre el ícono y el texto
                                           Text(
                                             selectedDate[0] != null
-                                                ? DateFormat('dd/MM/yyyy HH:mm')
+                                                ? DateFormat('HH:mm')
                                                     .format(selectedDate[0]!)
                                                 : '',
                                           ),
@@ -545,8 +475,8 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
                                                   8), // Espacio entre el ícono y el texto
                                           Text(
                                             selectedDate[1] != null
-                                                ? DateFormat('dd/MM/yyyy HH:mm')
-                                                    .format(selectedDate[0]!)
+                                                ? DateFormat('HH:mm')
+                                                    .format(selectedDate[1]!)
                                                 : '',
                                           ),
                                         ],
@@ -571,7 +501,7 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            "9. Tarifas",
+                            "Tarifas",
                             textAlign: TextAlign.left,
                             style: TextStyle(
                               fontFamily: 'Urbanist',
@@ -691,14 +621,13 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
                           ),
                         ],
                       ),
-                    
                     )
                   ],
                 ),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Colors.blue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                       30.0,
@@ -706,15 +635,15 @@ class _MostrarDatosParqueoScreenState extends State<MostrarDatosParqueoScreen> {
                   ), // Cambia el color de fondo del botón
                 ),
                 onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                      builder: (context) => ParkingSpaces(dataSearch:widget.dataSearch),
-                      ),
-  
-                    );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ParkingSpaces(dataSearch: widget.dataSearch),
+                    ),
+                  );
                 },
-                child: const Text('Ingresar'),
+                child: const Text('Empezar reserva'),
               ),
             ],
           ),

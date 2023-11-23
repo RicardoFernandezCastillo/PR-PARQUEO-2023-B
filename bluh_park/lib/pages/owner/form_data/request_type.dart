@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 
 class TypeUserRequest extends StatelessWidget {
   const TypeUserRequest({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

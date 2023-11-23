@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:bluehpark/main.dart';
 import 'package:bluehpark/models/auth/auth_service.dart';
+import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/pages/login/welcome_screen.dart';
 import 'package:bluehpark/utilities/progressbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,8 +16,8 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('user')
-            .doc('Gurl2Bh0zlPTZLSF1wwhChmVA3W2')
+            .collection(Collection.usuarios)
+            .doc(FirebaseAuth.instance.currentUser!.uid)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.active) {
@@ -111,7 +113,7 @@ class ProfilePage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const WelcomeScreen()),
+                                builder: (context) => const MyApp()),
                           );
                         },
                       ),

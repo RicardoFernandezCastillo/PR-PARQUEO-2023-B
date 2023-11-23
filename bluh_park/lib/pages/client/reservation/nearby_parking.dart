@@ -18,6 +18,14 @@ class SelectParkingScreen extends StatelessWidget {
               'Parqueos Cercanos Disponibles',
               style: TextStyle(color: Colors.white),
             ),
+          leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          iconSize: 30,
+          onPressed: () => Navigator.pop(context),
+        ),
             backgroundColor: const Color.fromARGB(255, 5, 126, 225)),
         body: const PlazaListScreen(),
       ),
@@ -75,8 +83,14 @@ class PlazaListScreenState extends State<PlazaListScreen> {
               final parqueo = parqueos[index];
               return InkWell(
                 onTap: () {
-                  // Implementa aquí la lógica que se realizará al hacer clic en el elemento.
-                  // Por ejemplo, puedes abrir una pantalla de detalles de la plaza.
+                  DataReservationSearch dataSearch = DataReservationSearch(idParqueo: parqueo.idParqueo);
+                  // Implementa aquí la lógica para abrir la pantalla de edición.
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MostrarDatosParqueoScreen(dataSearch: dataSearch)
+                    ),
+                  );
                 },
                 child: Card(
                   elevation: 3.0,

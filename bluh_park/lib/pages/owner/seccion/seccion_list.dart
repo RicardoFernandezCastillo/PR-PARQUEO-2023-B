@@ -95,7 +95,7 @@ class _SeccionListState extends State<SeccionList> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => PlazaListScreen(
+                                    builder: (context) => CreatePlaceScreen(
                                       seccionRef: seccion.idSeccion,
                                     ),
                                   ),

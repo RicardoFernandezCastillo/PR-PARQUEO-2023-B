@@ -3,6 +3,7 @@ import 'package:bluehpark/models/coleccion/collection_field.dart';
 import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/models/user.dart';
 import 'package:bluehpark/pages/client/home_client_page.dart';
+import 'package:bluehpark/pages/client/navigation_bar.dart';
 import 'package:bluehpark/pages/login/welcome_screen.dart';
 import 'package:bluehpark/utilities/progressbar.dart';
 import 'package:bluehpark/utilities/toast.dart';
@@ -81,7 +82,7 @@ class FormAccountScreenState extends State<RequetFormScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(40),
                 child: Image.asset(
-                  '../../images/logos/bluhpark-logo_5-app.jpg',
+                  'assets/logo_login.jpg',
                   width: 215,
                   height: 190,
                   fit: BoxFit.cover,
@@ -288,7 +289,7 @@ class FormAccountScreenState extends State<RequetFormScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                      const HomeClient(),
+                                      const MenuClient(),
                                   ),
                                 );
                               } catch (e) {

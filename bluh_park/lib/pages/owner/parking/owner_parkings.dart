@@ -16,7 +16,7 @@ class OwnerParkingsScreen extends StatelessWidget {
         appBar: AppBar(
             title: const Text('Mis parqueos'),
             backgroundColor: const Color.fromARGB(255, 5, 126, 225)),
-        //body: PlazaListScreen(),
+        body: const PlazaListScreen(),
       ),
     );
   }

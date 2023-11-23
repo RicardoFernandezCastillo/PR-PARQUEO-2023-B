@@ -1,4 +1,6 @@
 import 'dart:developer';
+import 'package:bluehpark/main.dart';
+import 'package:bluehpark/models/auth/auth_service.dart';
 import 'package:bluehpark/models/coleccion/collection_field.dart';
 import 'package:bluehpark/models/coleccion/collections.dart';
 import 'package:bluehpark/models/user.dart';
@@ -35,6 +37,19 @@ class RequestListScreenState extends State<RequestListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          //ProgressDialog.show(context, 'Cerrando Sesión');
+          AuthService().signOut();
+          //ProgressDialog.hide(context);
+          if (!context.mounted) return;
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MyApp()),
+          );
+        },
+        child: const Icon(Icons.close),
+      ),
       body: StreamBuilder(
         stream: getRequests(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -190,120 +205,124 @@ class RequestDetailScreenState extends State<RequestDetailScreen> {
         title: const Text('Solicitud'),
         backgroundColor: Colors.blue,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            TextFormField(
-              controller: nombreController,
-              decoration: const InputDecoration(
-                labelText: 'Nombre',
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              TextFormField(
+                controller: nombreController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre',
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            TextFormField(
-              controller: apellidoController,
-              decoration: const InputDecoration(
-                labelText: 'Apellido(s)',
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+              const SizedBox(height: 20.0),
+              TextFormField(
+                controller: apellidoController,
+                decoration: const InputDecoration(
+                  labelText: 'Apellido(s)',
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            TextFormField(
-              controller: correoController,
-              decoration: const InputDecoration(
-                labelText: 'Correo',
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+              const SizedBox(height: 20.0),
+              // TextFormField(
+              //   controller: correoController,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Correo',
+              //     focusedBorder: OutlineInputBorder(
+              //       borderSide: BorderSide(color: Colors.blue, width: 2.0),
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(height: 20.0),
+              // TextFormField(
+              //   controller: telefonoController,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Teléfono',
+              //     focusedBorder: OutlineInputBorder(
+              //       borderSide: BorderSide(color: Colors.blue, width: 2.0),
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(height: 20.0),
+              // const Text(
+              //   'Genero',
+              //   style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+              // ),
+              // Row(
+              //   children: <Widget>[
+              //     Radio(
+              //       value: 'Masculino',
+              //       groupValue: genero,
+              //       onChanged: (val) {
+              //         setState(() {
+              //           genero = val!;
+              //         });
+              //       },
+              //     ),
+              //     const Text('Masculino'),
+              //     Radio(
+              //       value: 'Femenino',
+              //       groupValue: genero,
+              //       onChanged: (val) {
+              //         setState(() {
+              //           genero = val!;
+              //         });
+              //       },
+              //     ),
+              //     const Text('Femenino'),
+              //   ],
+              // ),
+              //const SizedBox(height: 20.0),
+              TextFormField(
+                controller: descripcionController,
+                decoration: const InputDecoration(
+                  labelText: 'Descripción',
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            TextFormField(
-              controller: telefonoController,
-              decoration: const InputDecoration(
-                labelText: 'Teléfono',
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: () async {
+                  await setRejectRequest(widget.idRequest);
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                ),
+                child: const Text(
+                  'Rechazar Solicitud',
+                  style: TextStyle(fontSize: 18.0),
                 ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            const Text(
-              'Genero',
-              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
-            ),
-            Row(
-              children: <Widget>[
-                Radio(
-                  value: 'Masculino',
-                  groupValue: genero,
-                  onChanged: (val) {
-                    setState(() {
-                      genero = val!;
-                    });
-                  },
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: () async {
+                  await setEnabledRequest(widget.idRequest);
+                  if (!context.mounted) return;
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                 ),
-                const Text('Masculino'),
-                Radio(
-                  value: 'Femenino',
-                  groupValue: genero,
-                  onChanged: (val) {
-                    setState(() {
-                      genero = val!;
-                    });
-                  },
-                ),
-                const Text('Femenino'),
-              ],
-            ),
-            const SizedBox(height: 20.0),
-            TextFormField(
-              controller: descripcionController,
-              decoration: const InputDecoration(
-                labelText: 'Descripción',
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                child: const Text(
+                  'Aprobar Solicitud',
+                  style: TextStyle(fontSize: 18.0),
                 ),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () async {
-                await setRejectRequest(widget.idRequest);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-              ),
-              child: const Text(
-                'Rechazar Solicitud',
-                style: TextStyle(fontSize: 18.0),
-              ),
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: () async {
-                await setEnabledRequest(widget.idRequest);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-              ),
-              child: const Text(
-                'Aprobar Solicitud',
-                style: TextStyle(fontSize: 18.0),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -350,7 +369,7 @@ Future<void> setEnabledRequest(String idRequest) async {
 
 Future<void> setRejectRequest(String idRequest) async {
   try {
-        // Obtén una referencia al documento de la solicitud que deseas editar
+    // Obtén una referencia al documento de la solicitud que deseas editar
     final DocumentReference requestRef = FirebaseFirestore.instance
         .collection(Collection.ownerAccount)
         .doc(idRequest);

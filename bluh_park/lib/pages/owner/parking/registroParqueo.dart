@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io' show File;
+import 'package:bluehpark/pages/owner/navigation_bar.dart';
 import 'package:bluehpark/utilities/progressbar.dart';
 import 'package:bluehpark/utilities/toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -82,7 +83,6 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
           initialTime:
               TimeOfDay.fromDateTime(selectedDate[0] ?? DateTime.now()));
       if (pickedTime != null) {
-        if (pickedTime.hour > 6 && pickedTime.hour < 22) {
           setState(() {
             selectedDate[1] = DateTime(
               DateTime.now().year,
@@ -93,10 +93,6 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
             );
             selectedTime[1] = pickedTime;
           });
-        } else {
-          // ignore: use_build_context_synchronously
-          Toast.show(context, 'Horario no disponible');
-        }
       }
   }
 
@@ -842,7 +838,12 @@ class RegistroParqueoScreenState extends State<RegistroParqueoScreen> {
                               if (!context.mounted) return;
                               await ProgressDialog.hide(context);
                               if (!context.mounted) return;
-                              Navigator.of(context).pop();
+                                  Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const MenuOwner()), //),
+                                );
 
                             }
                           },
