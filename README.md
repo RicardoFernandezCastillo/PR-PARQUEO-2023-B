@@ -2,6 +2,7 @@
     Manual Técnico 
 
 Introducción: 
+Video Demostrativo: https://youtu.be/RL6Yh1atUXY?si=vKz0phmjwerJC9dP
 
 Una cordial bienvenida al Manual Técnico de BLUH-PARK. Este manual proporciona una guía detallada para desarrolladores que trabajen con el sistema para futuras actualizaciones de la aplicación. El presente manual abarca la información necesaria para instalar BLUH-PARK desde el entorno de desarrollo de Flutter desde Visual Studio Code 
 
